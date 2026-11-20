@@ -1,6 +1,23 @@
-# QiCore
+<p align="center">
+  <img src="enterprise/apps/admin/public/brand/qicore.png" alt="QiCore" width="104" height="104">
+</p>
 
-QiCore 是一套面向 Web 与小程序应用的开源开发框架，提供管理后台、Node.js API、H5 客户端和应用 SDK。每个站点独立部署，使用自己的数据库、管理员账号和存储空间。QiCore 可以直接运行，也可以接入一个主应用及其功能插件。
+<h1 align="center">QiCore</h1>
+
+<p align="center">
+  <strong>面向 Web 与小程序应用的开源管理框架。</strong><br>基于 Nuxt 和 NestJS，提供管理后台、API 与应用 SDK，内置账号权限、会员、支付配置和内容管理。
+</p>
+
+<p align="center">
+  <strong>简体中文</strong> · <a href="README.en.md" lang="en">English</a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/OrangeZh1/QiCore/actions/workflows/compatibility-host.yml"><img src="https://github.com/OrangeZh1/QiCore/actions/workflows/compatibility-host.yml/badge.svg?branch=main" alt="兼容宿主验收状态"></a>
+  <img src="https://img.shields.io/badge/Node.js-24-417E38" alt="Node.js 24">
+  <img src="https://img.shields.io/badge/MySQL-8-236283" alt="MySQL 8">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-287A47" alt="MIT License"></a>
+</p>
 
 ## 快速开始
 
@@ -27,7 +44,7 @@ pnpm dev
 
 ## 应用开发
 
-主应用通过 SDK 声明权限、后台页面和 API。插件可以扩展主应用的功能。以商业产品交付时，框架、主应用和随包插件按同一份签名清单安装和升级。[应用与插件开发指南](enterprise/docs/standalone-composition.md)
+每个站点独立部署，使用自己的数据库、账号和存储空间。QiCore 可以独立运行，也可以接入一个主应用及其插件。主应用通过 SDK 声明权限、后台页面和 API。插件可以扩展主应用的功能。以商业产品交付时，框架、主应用和随包插件按同一份签名清单安装和升级。[应用与插件开发指南](enterprise/docs/standalone-composition.md)
 
 | 路径 | 内容 |
 | --- | --- |
