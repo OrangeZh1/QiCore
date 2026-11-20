@@ -1,0 +1,18 @@
+{
+ "pages":[
+  {"path":"pages/home/index","style":{"navigationBarTitleText":"首页","navigationStyle":"custom"}},
+  {"path":"pages/profile/index","style":{"navigationBarTitleText":"个人中心","navigationStyle":"custom"}},
+  {"path":"pages/login/index","style":{"navigationBarTitleText":"登录","navigationStyle":"custom"}},
+  {"path":"pages/personal/index","style":{"navigationBarTitleText":"个人资料","navigationStyle":"default","h5":{"navigationStyle":"custom"}}},
+  {"path":"pages/levels/index","style":{"navigationBarTitleText":"会员等级","navigationStyle":"custom"}},
+  {"path":"pages/growth-records/index","style":{"navigationBarTitleText":"成长记录","navigationStyle":"custom"}},
+  {"path":"pages/member/index","style":{"navigationBarTitleText":"积分套餐","navigationStyle":"custom"}},
+  {"path":"pages/recharge/index","style":{"navigationBarTitleText":"我的余额","navigationStyle":"custom"}},
+  {"path":"pages/orders/index","style":{"navigationBarTitleText":"订单中心","navigationStyle":"custom"}},
+  {"path":"pages/help/index","style":{"navigationBarTitleText":"帮助中心","navigationStyle":"custom"}},
+  {"path":"pages/help/detail","style":{"navigationBarTitleText":"帮助详情","navigationStyle":"custom"}},
+  {"path":"pages/contact/index","style":{"navigationBarTitleText":"联系客服","navigationStyle":"custom"}},
+  {"path":"pages/policy/index","style":{"navigationBarTitleText":"协议","navigationStyle":"custom"}},
+  {"path":"pages/webview/index","style":{"navigationBarTitleText":"网页","navigationStyle":"custom"}}
+ ],"globalStyle":{"navigationStyle":"custom","backgroundColor":"#f3f9ff"}
+}

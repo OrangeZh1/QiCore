@@ -1,0 +1,82 @@
+{
+  "format": "qicore-update-baseline-v1",
+  "packageKey": "frm_cdm43f43e7yhk5jd",
+  "version": "0.1.9",
+  "releaseManifestSha256": "22316d7d85f04a14e6d4deb9a29064f873177b02c761f610d5b260843e1c5d9a",
+  "prismaFiles": [
+    {
+      "path": "apps/api/prisma/migrations/001_framework_initial/migration.sql",
+      "size": 44513,
+      "sha256": "741964448b4b40b492ff0e7a00b7fa57fb35011cdb485fbe63483d00bdbbcb03"
+    },
+    {
+      "path": "apps/api/prisma/migrations/002_mini_ad_settings/migration.sql",
+      "size": 366,
+      "sha256": "0530aec47a6a4ed179485e780b6f68960b2747013c806b6282f68300fd9a5a19"
+    },
+    {
+      "path": "apps/api/prisma/migrations/003_storage_ownership/migration.sql",
+      "size": 344,
+      "sha256": "dda11036a668476a4125f13f8b1137b88d88d62436f1d826a4712695f5079086"
+    },
+    {
+      "path": "apps/api/prisma/migrations/004_tenant_application_selection/migration.sql",
+      "size": 559,
+      "sha256": "81151ef2c981f9379ed8d77837b5676c090a66325ec8bdbe202d120bf4358b7c"
+    },
+    {
+      "path": "apps/api/prisma/migrations/005_site_storage/migration.sql",
+      "size": 394,
+      "sha256": "e05cd0971ad4369d0d2cc52a7759e7fa5c06479ee21e2e9438f46892538b8a8f"
+    },
+    {
+      "path": "apps/api/prisma/migrations/006_stored_images/migration.sql",
+      "size": 232,
+      "sha256": "998bbaa2b98fb306b42aa513544bba2cb966374d52883caed9165786e6583fb3"
+    },
+    {
+      "path": "apps/api/prisma/migrations/007_query_indexes/migration.sql",
+      "size": 1133,
+      "sha256": "068a58a13415961cece027e2fb8058979e9f56e79e1c0c348dd025dd5e5f38b4"
+    },
+    {
+      "path": "apps/api/prisma/migrations/migration_lock.toml",
+      "size": 19,
+      "sha256": "00969ee045a3c3f087a3460235a1a744c1e35bde4441e0c55e163225eb077608"
+    },
+    {
+      "path": "apps/api/prisma/schema.prisma",
+      "size": 32096,
+      "sha256": "02fdd2b7213129dc949d20daccab39db6a9e1f9fc79a48280cecfd75c869d826"
+    }
+  ],
+  "migrations": [
+    {
+      "id": "20261026000005_site_storage",
+      "order": 0,
+      "kind": "database",
+      "path": "migrations/20261026000005_site_storage.sql",
+      "sha256": "e05cd0971ad4369d0d2cc52a7759e7fa5c06479ee21e2e9438f46892538b8a8f",
+      "transactional": false,
+      "reversible": true
+    },
+    {
+      "id": "20261026000006_stored_images",
+      "order": 1,
+      "kind": "database",
+      "path": "migrations/20261026000006_stored_images.sql",
+      "sha256": "998bbaa2b98fb306b42aa513544bba2cb966374d52883caed9165786e6583fb3",
+      "transactional": false,
+      "reversible": true
+    },
+    {
+      "id": "20261028000007_query_indexes",
+      "order": 2,
+      "kind": "database",
+      "path": "migrations/20261028000007_query_indexes.sql",
+      "sha256": "068a58a13415961cece027e2fb8058979e9f56e79e1c0c348dd025dd5e5f38b4",
+      "transactional": false,
+      "reversible": true
+    }
+  ]
+}

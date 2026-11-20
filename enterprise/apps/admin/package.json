@@ -1,0 +1,28 @@
+{
+  "name": "@qicore/admin",
+  "version": "0.1.10",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nuxt dev --host 0.0.0.0 --port 3500 --dotenv ../../.env",
+    "build": "nuxt build --dotenv ../../.env",
+    "typecheck": "nuxt typecheck --dotenv ../../.env",
+    "test": "node --test test/*.test.mjs",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@nuxt/ui": "4.10.0",
+    "@orangezh1/qisvc-console-ui": "workspace:*",
+    "@wangeditor/editor": "5.1.23",
+    "nuxt": "4.5.2",
+    "tailwindcss": "4.3.1",
+    "vue": "3.5.42",
+    "vue-router": "5.2.0"
+  },
+  "devDependencies": {
+    "@iconify-json/lucide": "1.2.114",
+    "@types/node": "24.10.2",
+    "typescript": "5.9.3",
+    "vue-tsc": "3.3.9"
+  }
+}

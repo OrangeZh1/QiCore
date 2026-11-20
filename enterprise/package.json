@@ -1,0 +1,32 @@
+{
+  "name": "qicore",
+  "version": "0.1.10",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "packageManager": "pnpm@11.25.0",
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "scripts": {
+    "dev:api": "pnpm --filter @qicore/api dev",
+    "dev:admin": "pnpm --filter @qicore/admin dev",
+    "build": "pnpm --filter @qicore/api build && pnpm build:client && pnpm --filter @qicore/admin build",
+    "typecheck": "pnpm --filter @qicore/api typecheck && pnpm --filter @qicore/admin typecheck",
+    "db:generate": "pnpm --filter @qicore/api db:generate",
+    "db:migrate": "pnpm --filter @qicore/api db:migrate",
+    "test": "pnpm --filter @qicore/application-sdk test && pnpm --filter @qicore/mini-ads test && pnpm --filter @qicore/api test && pnpm --filter @qicore/admin test",
+    "build:sdk": "node packages/application-sdk/build.mjs",
+    "package:sdk": "node scripts/package-sdk.mjs",
+    "check:separation": "node scripts/check-application-separation.mjs",
+    "dev": "node scripts/development/run.mjs",
+    "dev:stop": "node scripts/development/stop.mjs",
+    "test:database": "node scripts/check-database.mjs",
+    "build:client": "pnpm build:sdk && pnpm --filter @qicore/client build:h5",
+    "install:source": "node scripts/install-standalone.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.1",
+    "playwright": "1.64.1"
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "format": "qicore-upstream-source-v1",
+  "sourceRepository": "https://github.com/OrangeZh1/Qicore-Saas",
+  "commit": "38af676e2b2a4c1f86d4c5ccf713c70a1a81d020",
+  "tree": "7ce85cdabf43ad7105b5954cf89471bb1063ca46",
+  "upstreamVersion": "0.1.10",
+  "importedAt": "2026-11-20T13:12:54+00:00",
+  "fileCount": 1203,
+  "fileBytes": 12587422,
+  "testFiles": 187,
+  "rootCounts": {
+    ".": 5,
+    "apps": 782,
+    "config": 13,
+    "docs": 2,
+    "packages": 369,
+    "patches": 3,
+    "scripts": 29
+  },
+  "includedSubtrees": [
+    "apps",
+    "packages",
+    "scripts",
+    "patches"
+  ],
+  "includedFiles": [
+    ".gitattributes",
+    ".gitignore",
+    "config/nginx-maintenance.conf.example",
+    "docs/reference-projects/niucloud/LICENSE",
+    "docs/reference-projects/niucloud/README.md",
+    "package.json",
+    "pnpm-lock.yaml",
+    "pnpm-workspace.yaml"
+  ],
+  "includedReleaseBaselineFiles": [
+    "config/release-baselines/qicore-0.1.0.json",
+    "config/release-baselines/qicore-0.1.1.json",
+    "config/release-baselines/qicore-0.1.2.json",
+    "config/release-baselines/qicore-0.1.3-database-plan.json",
+    "config/release-baselines/qicore-0.1.3.json",
+    "config/release-baselines/qicore-0.1.4-database-plan.json",
+    "config/release-baselines/qicore-0.1.4.json",
+    "config/release-baselines/qicore-0.1.5-database-plan.json",
+    "config/release-baselines/qicore-0.1.5.json",
+    "config/release-baselines/qicore-0.1.6.json",
+    "config/release-baselines/qicore-0.1.7.json",
+    "config/release-baselines/qicore-0.1.9-update-baseline.json"
+  ],
+  "excludedUpstreamConfigs": {
+    "config/customer-closeout-0.1.7.json": "a5f30e4dfab891152a9689b41a4643720706de43",
+    "config/license-product.json": "435d43bdf4c9f85844b8f34086104d6b86f37a19",
+    "config/release-baselines/qicore-0.1.6-initial-release.json": "4f931853e64f47e1f5bd6ff372943a4178c0cc41"
+  },
+  "upstreamTreeObjects": {
+    "apps": "ec27ef0a2d22cb6d5ee6c5dabac9d592bd32e9b0",
+    "packages": "6d0a4b56c1fa2862052a2d44d370fb12a955f435",
+    "scripts": "a7e84e28b3ef14e09527924da2186dee6dd34a82",
+    "patches": "86c933427a6e28601df67dbbb549055e9f15f1c1",
+    "config": "dc713f52752c6ac82422c951d2e2415a8b287bde"
+  },
+  "sourceChecksums": "UPSTREAM.sha256",
+  "sourceChecksumsSha256": "767ed1c975eae4abf480e6385bc553e16e4b9d203d43f5c58c93846835b7fd28",
+  "upstreamOnly": [
+    ".env.example",
+    ".github",
+    "AGENTS.md",
+    "README.md",
+    "QiCore.code-workspace",
+    "design-qa.md",
+    "docs except the included third-party references"
+  ],
+  "guides": {
+    "readme": "https://github.com/OrangeZh1/Qicore-Saas/blob/38af676e2b2a4c1f86d4c5ccf713c70a1a81d020/README.md",
+    "architecture": "https://github.com/OrangeZh1/Qicore-Saas/blob/38af676e2b2a4c1f86d4c5ccf713c70a1a81d020/docs/architecture.md",
+    "development": "https://github.com/OrangeZh1/Qicore-Saas/blob/38af676e2b2a4c1f86d4c5ccf713c70a1a81d020/docs/development-workspace.md",
+    "extensions": "https://github.com/OrangeZh1/Qicore-Saas/blob/38af676e2b2a4c1f86d4c5ccf713c70a1a81d020/docs/extension-development.md",
+    "runtime": "https://github.com/OrangeZh1/Qicore-Saas/blob/38af676e2b2a4c1f86d4c5ccf713c70a1a81d020/docs/native-package.md",
+    "ci": "https://github.com/OrangeZh1/Qicore-Saas/blob/38af676e2b2a4c1f86d4c5ccf713c70a1a81d020/docs/ci.md"
+  },
+  "workflowSources": [
+    "https://github.com/OrangeZh1/Qicore-Saas/blob/38af676e2b2a4c1f86d4c5ccf713c70a1a81d020/.github/workflows/verify.yml",
+    "https://github.com/OrangeZh1/Qicore-Saas/blob/38af676e2b2a4c1f86d4c5ccf713c70a1a81d020/.github/workflows/native-integrity-transition.yml",
+    "https://github.com/OrangeZh1/Qicore-Saas/blob/38af676e2b2a4c1f86d4c5ccf713c70a1a81d020/.github/workflows/delivery-closeout.yml"
+  ]
+}

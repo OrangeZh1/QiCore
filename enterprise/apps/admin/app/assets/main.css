@@ -1,0 +1,11 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+@import "@orangezh1/qisvc-console-ui/styles.css";
+@source "../../../../packages/qisvc-console-ui/components";
+body { background:#f5f7fb; color:#16243e; }
+/* Keep wheel, touch and keyboard scrolling without visible scrollbar tracks. */
+* { scrollbar-width: none; }
+*::-webkit-scrollbar { display: none; }
+
+:root { --console-topbar-height: 64px; }
+.qisvc-console-toolbar { height:var(--console-topbar-height); min-height:var(--console-topbar-height); box-sizing:border-box; }

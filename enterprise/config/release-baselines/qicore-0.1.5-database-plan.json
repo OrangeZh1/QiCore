@@ -1,0 +1,15 @@
+{
+  "format": "qicore-database-plan-v1",
+  "packageKey": "frm_cdm43f43e7yhk5jd",
+  "fromVersion": "0.1.4",
+  "version": "0.1.5",
+  "beforeSchemaSha256": "701de5dac9581e85fd5e6129c50f7a2e4e9f4d2182988065c2bc33657d827aa3",
+  "afterSchemaSha256": "02fdd2b7213129dc949d20daccab39db6a9e1f9fc79a48280cecfd75c869d826",
+  "migrations": [
+    {
+      "id": "20261028000007_query_indexes",
+      "sourcePath": "apps/api/prisma/migrations/007_query_indexes/migration.sql",
+      "sha256": "068a58a13415961cece027e2fb8058979e9f56e79e1c0c348dd025dd5e5f38b4"
+    }
+  ]
+}

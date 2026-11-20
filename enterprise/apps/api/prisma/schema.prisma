@@ -1,0 +1,987 @@
+generator client {
+  provider = "prisma-client-js"
+}
+datasource db {
+  provider = "mysql"
+  url = env("DATABASE_URL")
+}
+model ScheduledTask {
+  enterpriseId String? @db.VarChar(64)
+  @@index([enterpriseId,enabled,nextRunAt],map:"ScheduledTask_enterprise_due")
+  id String @id @db.VarChar(64)
+  name String @db.VarChar(60)
+  command String @db.VarChar(64)
+  params String @db.VarChar(1000)
+  rule String @db.VarChar(100)
+  enabled Boolean @default(true)
+  remark String @default("") @db.VarChar(200)
+  ownerId String @db.VarChar(64)
+  version Int @default(1)
+  running Boolean @default(false)
+  nextRunAt DateTime @db.DateTime(3)
+  lastRunAt DateTime? @db.DateTime(3)
+  lastFinishedAt DateTime? @db.DateTime(3)
+  lastStatus String? @db.VarChar(16)
+  lastError String? @db.VarChar(200)
+  durationMs Int?
+  maxDurationMs Int?
+  createdAt DateTime @default(now()) @db.DateTime(3)
+  @@index([enabled,nextRunAt])
+}
+model Tenant {
+  standaloneSlot Int @default(1) @unique(map:"Tenant_single_enterprise") @db.TinyInt
+  id String @id @db.VarChar(64)
+  name String @db.VarChar(128)
+  version Int @default(1)
+  permissionRoles TenantRole[]
+  adminScopes AdminTenantScope[]
+  applications TenantApplication[]
+  siteSetting TenantSiteSetting?
+  storageSetting SiteStorageSetting?
+  contactName String @default("") @db.VarChar(64)
+  contactPhone String @default("") @db.VarChar(32)
+  enabled Boolean @default(true)
+  createdAt DateTime? @default(now()) @db.DateTime(3)
+  logo String? @db.MediumText
+  storageMode String @default("platform") @db.VarChar(16)
+  remark String @default("") @db.VarChar(1000)
+  customDomain String? @unique @db.VarChar(253)
+  expiresAt DateTime? @db.DateTime(3)
+  ownerAdminId String? @db.VarChar(64)
+}
+model TenantApplication {
+  helpCategories HelpCategory[]
+  memberLevels MemberLevel[]
+  memberTags MemberTag[]
+  memberRule MemberRule?
+  memberPurchases MemberPurchaseGrowth[]
+  h5Setting TenantH5Setting?
+  pageSharing TenantPageSharing[]
+  decoration TenantDecoration?
+  consumerSetting TenantConsumerSetting?
+  tenantId String @db.VarChar(64)
+  applicationKey String @db.VarChar(64)
+  tenant Tenant @relation(fields:[tenantId],references:[id],onDelete:Cascade)
+  enabled Boolean @default(true)
+  activeSlot Int? @default(1) @db.TinyInt
+  expiresAt DateTime? @db.DateTime(3)
+  version Int @default(1)
+  config Json
+  configVersion Int @default(1)
+  @@id([tenantId,applicationKey])
+  @@index([applicationKey,enabled,expiresAt])
+  @@unique([tenantId,activeSlot], map:"TenantApplication_single_app")
+  @@index([applicationKey,activeSlot], map:"TenantApplication_active_scope")
+}
+model TenantDecoration {
+ tenantId String @db.VarChar(64)
+ applicationKey String @db.VarChar(64)
+ application TenantApplication @relation(fields:[tenantId,applicationKey],references:[tenantId,applicationKey],onDelete:Cascade)
+ schemes Json
+ groups Json?
+ published Json?
+ activeId String? @db.VarChar(36)
+ publishedAt DateTime? @db.DateTime(3)
+ version Int @default(0)
+ @@id([tenantId,applicationKey])
+}
+model TenantPageSharing {
+ tenantId String @db.VarChar(64)
+ applicationKey String @db.VarChar(64)
+ page String @db.VarChar(16)
+ channel String @db.VarChar(16)
+ application TenantApplication @relation(fields:[tenantId,applicationKey],references:[tenantId,applicationKey],onDelete:Cascade)
+ config Json
+ version Int @default(1)
+ updatedAt DateTime @updatedAt @db.DateTime(3)
+ @@id([tenantId,applicationKey,page,channel])
+}
+model AdminProvisionRequest {
+  actorId String @db.VarChar(64)
+  requestId String @db.VarChar(36)
+  kind String @db.VarChar(32)
+  payloadHash String @db.VarChar(64)
+  resultId String @db.VarChar(64)
+  createdAt DateTime @default(now()) @db.DateTime(3)
+  @@id([actorId,requestId])
+}
+model PlatformStorageSetting {
+  id String @id @db.VarChar(32)
+  version Int @default(1)
+  activeRevisionId String @db.VarChar(36)
+  providers Json
+}
+model SiteStorageSetting {
+  siteId String @id @db.VarChar(64)
+  tenant Tenant @relation(fields:[siteId],references:[id],onDelete:Cascade)
+  version Int @default(1)
+  activeRevisionId String? @db.VarChar(36)
+  providers Json
+}
+model SiteSetting {
+  id String @id @db.VarChar(32)
+  version Int @default(1)
+  config Json
+}
+model TenantSiteSetting {
+ tenantId String @id @db.VarChar(64)
+ tenant Tenant @relation(fields:[tenantId],references:[id],onDelete:Cascade)
+ config Json
+ version Int @default(1)
+ updatedAt DateTime @updatedAt @db.DateTime(3)
+}
+model TenantSubscriptionSetting {
+ tenantId String @db.VarChar(64)
+ applicationKey String @db.VarChar(64)
+ appId String @db.VarChar(64)
+ config Json
+ version Int @default(1)
+ updatedAt DateTime @updatedAt @db.DateTime(3)
+ @@id([tenantId,applicationKey])
+}
+model SubscriptionConsent {
+ id String @id @db.VarChar(36)
+ tenantId String @db.VarChar(64)
+ applicationKey String @db.VarChar(64)
+ userId String @db.VarChar(64)
+ targetId String @db.VarChar(64)
+ attempt Int
+ appId String @db.VarChar(64)
+ settingsVersion Int
+ choices Json
+ configSnapshot Json
+ createdAt DateTime @default(now()) @db.DateTime(3)
+ expiresAt DateTime @db.DateTime(3)
+ @@unique([tenantId,applicationKey,targetId,attempt],map:"SubscriptionConsent_target_key")
+}
+model SubscriptionDelivery {
+ id String @id @db.VarChar(36)
+ consentId String @unique @db.VarChar(36)
+ tenantId String @db.VarChar(64)
+ applicationKey String @db.VarChar(64)
+ userId String @db.VarChar(64)
+ appId String @db.VarChar(64)
+ event String @db.VarChar(64)
+ targetId String @db.VarChar(64)
+ templateId String @db.VarChar(128)
+ payload Json
+ settingsVersion Int
+ status String @db.VarChar(16)
+ errorCode String? @db.VarChar(64)
+ attempts Int @default(0)
+ claimToken String? @db.VarChar(36)
+ nextAttemptAt DateTime @default(now()) @db.DateTime(3)
+ expiresAt DateTime @db.DateTime(3)
+ createdAt DateTime @default(now()) @db.DateTime(3)
+ updatedAt DateTime @updatedAt @db.DateTime(3)
+ @@index([tenantId,applicationKey,createdAt],map:"SubscriptionDelivery_scope_idx")
+ @@index([status,nextAttemptAt],map:"SubscriptionDelivery_queue_idx")
+}
+model TenantSmsSetting {
+ tenantId String @db.VarChar(64)
+ applicationKey String @db.VarChar(64)
+ config Json
+ secretsCipher String? @db.Text
+ version Int @default(1)
+ updatedAt DateTime @updatedAt @db.DateTime(3)
+ @@id([tenantId,applicationKey])
+}
+model TenantSmsDelivery {
+ id String @id @db.VarChar(36)
+ tenantId String @db.VarChar(64)
+ applicationKey String @db.VarChar(64)
+ requestId String @db.VarChar(36)
+ actorId String @db.VarChar(64)
+ provider String @db.VarChar(16)
+ purpose String @db.VarChar(16)
+ phoneHash String @db.VarChar(64)
+ phoneMasked String @db.VarChar(20)
+ payloadHash String @db.VarChar(64)
+ settingsVersion Int
+ status String @db.VarChar(16)
+ errorCode String? @db.VarChar(64)
+ receipt String? @db.VarChar(128)
+ createdAt DateTime @default(now()) @db.DateTime(3)
+ updatedAt DateTime @updatedAt @db.DateTime(3)
+ @@unique([tenantId,applicationKey,requestId],map:"TenantSmsDelivery_request_key")
+ @@index([tenantId,applicationKey,createdAt],map:"TenantSmsDelivery_scope_idx")
+ @@index([status,createdAt],map:"TenantSmsDelivery_recovery_idx")
+}
+model SiteAsset {
+  siteId String? @db.VarChar(64)
+  revisionId String? @db.VarChar(36)
+  objectKey String? @db.VarChar(256)
+  publicUrl String? @db.VarChar(1024)
+  bytes Int?
+  id String @id @db.VarChar(36)
+  kind String @db.VarChar(16)
+  mime String @db.VarChar(32)
+  data Bytes @db.MediumBlob
+  createdAt DateTime @default(now()) @db.DateTime(3)
+  sourceMaterialId String? @db.VarChar(36)
+  @@unique([sourceMaterialId,kind])
+}
+model MaterialGroup {
+  id String @id @db.VarChar(36)
+  kind String @db.VarChar(16)
+  name String @db.VarChar(40)
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.DateTime(3)
+  materials Material[]
+  @@unique([kind,name])
+}
+model Material {
+  id String @id @db.VarChar(36)
+  kind String @db.VarChar(16)
+  name String @db.VarChar(180)
+  mime String @db.VarChar(100)
+  bytes Int
+  hash String @db.VarChar(64)
+  provider String @db.VarChar(16)
+  revisionId String? @db.VarChar(36)
+  objectKey String? @unique @db.VarChar(256)
+  legacySiteAssetId String? @unique @db.VarChar(36)
+  ownerId String @db.VarChar(64)
+  visibility String @db.VarChar(16)
+  groupId String? @db.VarChar(36)
+  group MaterialGroup? @relation(fields:[groupId],references:[id],onDelete:SetNull)
+  status String @db.VarChar(16)
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.DateTime(3)
+  deletedAt DateTime? @db.DateTime(3)
+  @@index([kind,status,createdAt])
+  @@index([ownerId,visibility])
+}
+model StorageRevision {
+  id String @id @db.VarChar(36)
+  provider String @db.VarChar(16)
+  config Json
+  secretsCipher String? @db.Text
+  createdAt DateTime @default(now()) @db.DateTime(3)
+}
+model StorageObject {
+  id String @id @db.VarChar(36)
+  revisionId String @db.VarChar(36)
+  objectKey String @unique @db.VarChar(256)
+  tenantId String @db.VarChar(64)
+  applicationKey String? @db.VarChar(64)
+  userId String @db.VarChar(64)
+  retention String @default("legacy") @db.VarChar(16)
+  expiresAt DateTime @db.DateTime(3)
+  deletedAt DateTime? @db.DateTime(3)
+  deleteRetryAt DateTime? @db.DateTime(3)
+  createdAt DateTime @default(now()) @db.DateTime(3)
+  @@index([expiresAt,deletedAt])
+  @@index([retention,deletedAt,expiresAt])
+}
+model AdminRole {
+  id String @id @db.VarChar(64)
+  name String @db.VarChar(64)
+  portal String @db.VarChar(16)
+  permissions Json
+  systemCode String? @unique @db.VarChar(32)
+  enabled Boolean @default(true)
+  version Int @default(1)
+  accounts AdminAccount[]
+  createdAt DateTime @default(now()) @db.DateTime(3)
+}
+model AdminAccount {
+  id String @id @db.VarChar(64)
+  username String @unique @db.VarChar(32)
+  nickname String @db.VarChar(64)
+  avatar String? @db.MediumText
+  phone String @default("") @db.VarChar(32)
+  allowMultipleSessions Boolean @default(true)
+  deletedAt DateTime? @db.DateTime(3)
+  passwordHash String @db.VarChar(256)
+  roleId String @db.VarChar(64)
+  role AdminRole @relation(fields:[roleId], references:[id])
+  enabled Boolean @default(true)
+  version Int @default(1)
+  scopes AdminTenantScope[]
+  sessions AdminSession[]
+  createdAt DateTime @default(now()) @db.DateTime(3)
+}
+model AdminTenantScope {
+  adminId String @db.VarChar(64)
+  tenantId String @db.VarChar(64)
+  permissionRoleId String? @db.VarChar(64)
+  permissionRole TenantRole? @relation(fields:[permissionRoleId],references:[id],onDelete:Restrict)
+  enabled Boolean @default(true)
+  version Int @default(1)
+  admin AdminAccount @relation(fields:[adminId],references:[id],onDelete:Cascade)
+  tenant Tenant @relation(fields:[tenantId],references:[id])
+  @@id([adminId,tenantId])
+}
+model TenantRole {
+  id String @id @db.VarChar(64)
+  tenantId String @db.VarChar(64)
+  tenant Tenant @relation(fields:[tenantId],references:[id],onDelete:Restrict)
+  name String @db.VarChar(50)
+  permissions Json
+  enabled Boolean @default(true)
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.DateTime(3)
+  members AdminTenantScope[]
+  @@unique([tenantId,name])
+  @@index([tenantId,createdAt])
+}
+model AdminSession {
+  tokenHash String @id @db.VarChar(64)
+  csrfHash String @db.VarChar(64)
+  adminId String @db.VarChar(64)
+  admin AdminAccount @relation(fields:[adminId],references:[id],onDelete:Cascade)
+  portal String @db.VarChar(16)
+  expiresAt DateTime @db.DateTime(3)
+  createdAt DateTime @default(now()) @db.DateTime(3)
+  delegations AdminDelegation[]
+  @@index([adminId])
+  @@index([expiresAt])
+}
+model AdminDelegation {
+  tokenHash String @id @db.VarChar(64)
+  parentTokenHash String @db.VarChar(64)
+  parent AdminSession @relation(fields:[parentTokenHash],references:[tokenHash],onDelete:Cascade)
+  tenantId String @db.VarChar(64)
+  targetAdminId String @db.VarChar(64)
+  expiresAt DateTime @db.DateTime(3)
+  createdAt DateTime @default(now()) @db.DateTime(3)
+  @@index([parentTokenHash])
+  @@index([expiresAt])
+  @@index([targetAdminId])
+}
+model Session {
+  wechatSessionCipher String? @db.Text
+  authProvider String? @db.VarChar(16)
+  authAppId String? @db.VarChar(64)
+  token String @id @db.VarChar(64)
+  applicationKey String @db.VarChar(64)
+  tenantId String @db.VarChar(64)
+  userId String @db.VarChar(64)
+  role String @db.VarChar(16)
+  expiresAt DateTime @db.DateTime(3)
+  @@index([tenantId,userId])
+  @@index([tenantId,applicationKey,userId])
+  @@index([expiresAt])
+}
+
+// Framework assets are scoped by tenant, application and consumer.
+model WalletAccount {
+ id String @id @db.VarChar(36)
+ tenantId String @db.VarChar(64)
+ applicationKey String @db.VarChar(64)
+ userId String @db.VarChar(64)
+ asset String @db.VarChar(16)
+ amount BigInt @default(0)
+ version Int @default(0)
+ @@unique([tenantId,applicationKey,userId,asset],map:"WalletAccount_scope_key")
+}
+model WalletLot {
+ id String @id @db.VarChar(36)
+ accountId String @db.VarChar(36)
+ sourceKey String @db.VarChar(160)
+ sourceOrder String? @db.VarChar(64)
+ kind String @db.VarChar(32)
+ original BigInt
+ remaining BigInt
+ spent BigInt @default(0)
+ createdAt DateTime @default(now()) @db.DateTime(3)
+ @@unique([accountId,sourceKey],map:"WalletLot_source_key")
+ @@index([accountId,createdAt,id],map:"WalletLot_account_idx")
+ @@index([sourceOrder],map:"WalletLot_order_idx")
+}
+model WalletEntry {
+ id String @id @db.VarChar(36)
+ accountId String @db.VarChar(36)
+ requestKey String @db.VarChar(160)
+ payloadHash String @db.VarChar(64)
+ kind String @db.VarChar(32)
+ reference String @db.VarChar(64)
+ delta BigInt
+ beforeAmount BigInt
+ afterAmount BigInt
+ parts Json
+ reason String @db.VarChar(200)
+ actor String @db.VarChar(64)
+ createdAt DateTime @default(now()) @db.DateTime(3)
+ @@unique([accountId,requestKey],map:"WalletEntry_request_key")
+ @@index([accountId,createdAt,id],map:"WalletEntry_account_idx")
+}
+model RechargeSetting {
+ tenantId String @db.VarChar(64)
+ applicationKey String @db.VarChar(64)
+ version Int @default(1)
+ config Json
+ updatedAt DateTime @updatedAt @db.DateTime(3)
+ @@id([tenantId,applicationKey])
+}
+model RechargeOrder {
+ id String @id @db.VarChar(20)
+ tenantId String @db.VarChar(64)
+ applicationKey String @db.VarChar(64)
+ userId String @db.VarChar(64)
+ requestKey String @db.VarChar(64)
+ payloadHash String @db.VarChar(64)
+ kind String @db.VarChar(16)
+ product Json
+ amount Int
+ currency String @default("CNY") @db.VarChar(3)
+ status String @default("pending") @db.VarChar(16)
+ consumerDeletedAt DateTime? @db.DateTime(3)
+ createdAt DateTime @default(now()) @db.DateTime(3)
+ @@unique([tenantId,applicationKey,userId,requestKey],map:"RechargeOrder_request_key")
+ @@index([tenantId,applicationKey,userId,createdAt,id],map:"RechargeOrder_consumer_idx")
+ @@index([tenantId,applicationKey,createdAt,id],map:"RechargeOrder_scope_idx")
+}
+model ConsumerAssetOperation {
+ id String @id @db.VarChar(36)
+ tenantId String @db.VarChar(64)
+ applicationKey String @db.VarChar(64)
+ userId String @db.VarChar(64)
+ requestId String @db.VarChar(36)
+ payloadHash String @db.VarChar(64)
+ kind String @db.VarChar(32)
+ assetType String @db.VarChar(16)
+ reference String? @db.VarChar(64)
+ delta BigInt
+ beforeAmount BigInt
+ afterAmount BigInt
+ grantId String? @db.VarChar(64)
+ reason String @db.VarChar(200)
+ actorId String @db.VarChar(64)
+ actorName String @db.VarChar(64)
+ membershipBefore Json
+ membershipAfter Json
+ createdAt DateTime @default(now()) @db.DateTime(3)
+ @@unique([tenantId,applicationKey,requestId],map:"ConsumerAssetOperation_request_key")
+ @@index([tenantId,applicationKey,userId,createdAt],map:"ConsumerAssetOperation_scope_idx")
+}
+// Public payment records retain immutable scope and credential references.
+model PaymentRecord {
+ providerState Json?
+ refunds PaymentRefund[]
+ id String @id @db.VarChar(32)
+ tenantId String @db.VarChar(64)
+ applicationKey String @db.VarChar(64)
+ orderId String @db.VarChar(64)
+ userId String @db.VarChar(64)
+ provider String @db.VarChar(16)
+ revisionId String @db.VarChar(36)
+ payerCipher String @db.Text
+ amount Int
+ currency String @db.VarChar(3)
+ state String @db.VarChar(24)
+ transactionId String? @unique @db.VarChar(64)
+ payerTotal Int?
+ paidAt DateTime? @db.DateTime(3)
+ prepayId String? @db.VarChar(128)
+ signingHash String? @db.VarChar(64)
+ expiresAt DateTime @db.DateTime(3)
+ closeRequested Boolean @default(false)
+ closeReason String? @db.VarChar(16)
+ // One current attempt per order; MySQL permits multiple historical NULL slots.
+ currentSlot Int? @default(1)
+ sequence Int @default(1)
+ previousId String? @unique @db.VarChar(32)
+ supersededAt DateTime? @db.DateTime(3)
+ leaseToken String? @db.VarChar(36)
+ leaseUntil DateTime? @db.DateTime(3)
+ nextCheckAt DateTime @default(now()) @db.DateTime(3)
+ attempts Int @default(0)
+ lastError String? @db.VarChar(64)
+ createdAt DateTime @default(now()) @db.DateTime(3)
+ @@unique([tenantId,applicationKey,orderId,currentSlot], map: "PaymentRecord_order_key")
+ @@unique([tenantId,applicationKey,orderId,sequence], map: "PaymentRecord_sequence_key")
+ @@index([nextCheckAt,state], map: "PaymentRecord_recovery_idx")
+ @@index([state,nextCheckAt], map: "PaymentRecord_pending_idx")
+}
+model PaymentRefund {
+ providerState Json?
+ amount Int?
+ id String @id @db.VarChar(32)
+ paymentId String @db.VarChar(32)
+ payment PaymentRecord @relation(fields:[paymentId],references:[id])
+ sequence Int @default(1)
+ previousId String? @unique @db.VarChar(32)
+ requestKey String? @db.VarChar(64)
+ source String @default("admin") @db.VarChar(16)
+ reviewReason String? @db.VarChar(200)
+ reviewedBy String? @db.VarChar(64)
+ reviewedAt DateTime? @db.DateTime(3)
+ reason String @db.VarChar(200)
+ state String @db.VarChar(24)
+ refundId String? @unique @db.VarChar(64)
+ payerRefund Int?
+ succeededAt DateTime? @db.DateTime(3)
+ leaseToken String? @db.VarChar(36)
+ leaseUntil DateTime? @db.DateTime(3)
+ nextCheckAt DateTime @default(now()) @db.DateTime(3)
+ attempts Int @default(0)
+ lastError String? @db.VarChar(64)
+ createdAt DateTime @default(now()) @db.DateTime(3)
+ @@unique([paymentId,sequence], map: "PaymentRefund_sequence_key")
+ @@unique([paymentId,requestKey], map: "PaymentRefund_request_key")
+ @@index([nextCheckAt,state], map: "PaymentRefund_recovery_idx")
+ @@index([state,nextCheckAt], map: "PaymentRefund_pending_idx")
+}
+model PaymentNotice {
+ id String @id @db.VarChar(64)
+ paymentId String @db.VarChar(32)
+ kind String @db.VarChar(16)
+ payloadHash String @db.VarChar(64)
+ payloadCipher String @db.Text
+ state String @db.VarChar(16)
+ attempts Int @default(0)
+ nextCheckAt DateTime @default(now()) @db.DateTime(3)
+ lastError String? @db.VarChar(64)
+ createdAt DateTime @default(now()) @db.DateTime(3)
+ @@index([nextCheckAt,state], map: "PaymentNotice_recovery_idx")
+ @@index([state,nextCheckAt], map: "PaymentNotice_pending_idx")
+ @@index([paymentId,state], map: "PaymentNotice_payment_idx")
+}
+
+model VirtualGoods {
+ id String @id @db.VarChar(32)
+ tenantId String @db.VarChar(64)
+ applicationKey String @db.VarChar(64)
+ appId String @db.VarChar(64)
+ offerId String @db.VarChar(32)
+ env Int
+ localId String @db.VarChar(64)
+ productId String @db.VarChar(20)
+ snapshotHash String @db.VarChar(64)
+ payload Json
+ uploadState String @default("PENDING") @db.VarChar(16)
+ publishState String @default("PENDING") @db.VarChar(16)
+ message String @default("") @db.VarChar(300)
+ createdAt DateTime @default(now()) @db.DateTime(3)
+ updatedAt DateTime @updatedAt @db.DateTime(3)
+ @@unique([appId,env,productId], map: "VirtualGoods_remote_key")
+ @@index([tenantId,applicationKey,appId,env], map: "VirtualGoods_scope_idx")
+}
+model VirtualGoodsTask {
+ id String @id @db.VarChar(64)
+ tenantId String @db.VarChar(64)
+ applicationKey String @db.VarChar(64)
+ operationId String @db.VarChar(36)
+ revisionId String @db.VarChar(36)
+ miniVersion Int
+ action String @db.VarChar(16)
+ itemIds Json
+ cursor Int @default(0)
+ stage String @default("START") @db.VarChar(16)
+ state String @db.VarChar(16)
+ message String @default("") @db.VarChar(300)
+ leaseToken String? @db.VarChar(36)
+ leaseUntil DateTime? @db.DateTime(3)
+ updatedAt DateTime @updatedAt @db.DateTime(3)
+}
+
+model VirtualGoodsSetting {
+ tenantId String @db.VarChar(64)
+ applicationKey String @db.VarChar(64)
+ localId String @db.VarChar(64)
+ config Json
+ version Int @default(1)
+ updatedAt DateTime @updatedAt @db.DateTime(3)
+ @@id([tenantId,applicationKey,localId])
+}
+model Audit {
+  id String @id @db.VarChar(64)
+  applicationKey String? @db.VarChar(64)
+  scope String @default("tenant") @db.VarChar(16)
+  tenantId String @db.VarChar(64)
+  actor String @db.VarChar(64)
+  action String @db.VarChar(32)
+  details Json
+  createdAt DateTime @default(now()) @db.DateTime(3)
+  @@index([scope,createdAt,id])
+  @@index([scope,action,createdAt])
+  @@index([scope,actor,createdAt])
+  @@index([scope,tenantId,applicationKey,createdAt])
+}
+
+
+model TenantMaterialGroup {
+ id String @id @db.VarChar(36)
+ tenantId String @db.VarChar(64)
+ scopeKey String @db.VarChar(64)
+ kind String @db.VarChar(16)
+ name String @db.VarChar(40)
+ version Int @default(1)
+ createdAt DateTime @default(now()) @db.DateTime(3)
+ materials TenantMaterial[]
+ @@unique([tenantId,scopeKey,kind,name])
+ @@unique([tenantId,scopeKey,kind,id])
+}
+model TenantMaterial {
+ id String @id @db.VarChar(36)
+ tenantId String @db.VarChar(64)
+ scopeKey String @db.VarChar(64)
+ kind String @db.VarChar(16)
+ name String @db.VarChar(180)
+ mime String @db.VarChar(100)
+ bytes Int
+ hash String @db.VarChar(64)
+ provider String @db.VarChar(16)
+ revisionId String @db.VarChar(36)
+ objectKey String @unique @db.VarChar(256)
+ ownerId String @db.VarChar(64)
+ groupId String? @db.VarChar(36)
+ group TenantMaterialGroup? @relation(fields:[tenantId,scopeKey,kind,groupId],references:[tenantId,scopeKey,kind,id],onDelete:Restrict,onUpdate:Restrict)
+ status String @db.VarChar(16)
+ version Int @default(1)
+ createdAt DateTime @default(now()) @db.DateTime(3)
+ deletedAt DateTime? @db.DateTime(3)
+ @@index([tenantId,scopeKey,kind,deletedAt,createdAt])
+}
+
+
+model TenantConsumerSetting {
+ tenantId String @db.VarChar(64)
+ applicationKey String @db.VarChar(64)
+ application TenantApplication @relation(fields:[tenantId,applicationKey],references:[tenantId,applicationKey],onDelete:Cascade)
+ config Json
+ version Int @default(0)
+ nextNumber Int @default(1)
+ @@id([tenantId,applicationKey])
+}
+model ConsumerProfile {
+ standaloneBenefits StandaloneBenefitHolding[]
+ growth Int @default(0)
+ memberLevelId String? @db.VarChar(36)
+ memberLevel MemberLevel? @relation(fields:[tenantId,applicationKey,memberLevelId],references:[tenantId,applicationKey,id],onDelete:Restrict)
+ memberTags ConsumerTag[]
+ growthRecords MemberGrowthRecord[]
+ memberNumber String? @db.VarChar(32)
+ phone String @default("") @db.VarChar(32)
+ email String @default("") @db.VarChar(254)
+ gender String @default("unknown") @db.VarChar(16)
+ enabled Boolean @default(true)
+ passwordHash String? @db.VarChar(256)
+ deletedAt DateTime? @db.DateTime(3)
+ tenantId String @db.VarChar(64)
+ applicationKey String @db.VarChar(64)
+ userId String @db.VarChar(64)
+ nickname String @db.VarChar(64)
+ avatar String? @db.MediumText
+ version Int @default(1)
+ createdAt DateTime @default(now()) @db.DateTime(3)
+ updatedAt DateTime @updatedAt @db.DateTime(3)
+ @@id([tenantId,applicationKey,userId])
+ @@unique([tenantId,applicationKey,memberNumber],map:"ConsumerProfile_member_number_key")
+ @@index([tenantId,applicationKey,deletedAt,createdAt(sort: Desc),userId],map:"ConsumerProfile_listing_idx")
+}
+
+model MemberLevel {
+ tenantId String @db.VarChar(64)
+ applicationKey String @db.VarChar(64)
+ id String @db.VarChar(36)
+ name String @db.VarChar(32)
+ systemKey String? @db.VarChar(16)
+ benefits Json?
+ threshold Int
+ rank Int
+ upgradeMode String @default("all") @db.VarChar(8)
+ conditions Json?
+ description String @default("") @db.VarChar(200)
+ version Int @default(1)
+ createdAt DateTime @default(now()) @db.DateTime(3)
+ updatedAt DateTime @updatedAt @db.DateTime(3)
+ application TenantApplication @relation(fields:[tenantId,applicationKey],references:[tenantId,applicationKey],onDelete:Cascade)
+ members ConsumerProfile[]
+ @@id([tenantId,applicationKey,id])
+ @@unique([tenantId,applicationKey,name])
+ @@unique([tenantId,applicationKey,rank])
+ @@unique([tenantId,applicationKey,systemKey])
+}
+model MemberTag {
+ tenantId String @db.VarChar(64)
+ applicationKey String @db.VarChar(64)
+ id String @db.VarChar(36)
+ name String @db.VarChar(32)
+ description String @default("") @db.VarChar(200)
+ version Int @default(1)
+ createdAt DateTime @default(now()) @db.DateTime(3)
+ updatedAt DateTime @updatedAt @db.DateTime(3)
+ application TenantApplication @relation(fields:[tenantId,applicationKey],references:[tenantId,applicationKey],onDelete:Cascade)
+ members ConsumerTag[]
+ @@id([tenantId,applicationKey,id])
+ @@unique([tenantId,applicationKey,name])
+}
+model ConsumerTag {
+ tenantId String @db.VarChar(64)
+ applicationKey String @db.VarChar(64)
+ userId String @db.VarChar(64)
+ tagId String @db.VarChar(36)
+ profile ConsumerProfile @relation(fields:[tenantId,applicationKey,userId],references:[tenantId,applicationKey,userId],onDelete:Cascade)
+ tag MemberTag @relation(fields:[tenantId,applicationKey,tagId],references:[tenantId,applicationKey,id],onDelete:Restrict)
+ @@id([tenantId,applicationKey,userId,tagId])
+}
+model MemberRule {
+ tenantId String @db.VarChar(64)
+ applicationKey String @db.VarChar(64)
+ registrationGrowth Int @default(0)
+ purchaseGrowthPerYuan Int @default(0)
+ baseLevel Json?
+ version Int @default(1)
+ application TenantApplication @relation(fields:[tenantId,applicationKey],references:[tenantId,applicationKey],onDelete:Cascade)
+ @@id([tenantId,applicationKey])
+}
+model MemberPurchaseGrowth {
+ tenantId String @db.VarChar(64)
+ applicationKey String @db.VarChar(64)
+ orderId String @db.VarChar(64)
+ userId String @db.VarChar(64)
+ perYuan Int
+ multiplierBps Int @default(10000)
+ paidCents BigInt
+ earned Int
+ refundedCents BigInt @default(0)
+ returned Int @default(0)
+ createdAt DateTime @default(now()) @db.DateTime(3)
+ application TenantApplication @relation(fields:[tenantId,applicationKey],references:[tenantId,applicationKey],onDelete:Cascade)
+ @@id([tenantId,applicationKey,orderId])
+}
+model MemberGrowthRecord {
+ tenantId String @db.VarChar(64)
+ applicationKey String @db.VarChar(64)
+ userId String @db.VarChar(64)
+ requestId String @db.VarChar(64)
+ payloadHash String @db.VarChar(64)
+ kind String @db.VarChar(24)
+ before Int
+ after Int
+ levelBefore Json
+ levelAfter Json
+ reason String @db.VarChar(200)
+ actor String @db.VarChar(64)
+ createdAt DateTime @default(now()) @db.DateTime(3)
+ profile ConsumerProfile @relation(fields:[tenantId,applicationKey,userId],references:[tenantId,applicationKey,userId],onDelete:Cascade)
+ @@id([tenantId,applicationKey,userId,requestId])
+ @@index([tenantId,applicationKey,userId,createdAt])
+}
+model TenantH5Setting {
+ tenantId String @db.VarChar(64)
+ applicationKey String @db.VarChar(64)
+ displayName String @db.VarChar(64)
+ entryUrl String @db.VarChar(1000)
+ favicon String? @db.MediumText
+ version Int @default(1)
+ updatedAt DateTime @updatedAt @db.DateTime(3)
+ application TenantApplication @relation(fields:[tenantId,applicationKey],references:[tenantId,applicationKey],onDelete:Cascade)
+ @@id([tenantId,applicationKey])
+}
+
+model TenantPaymentRevision {
+ id String @id @db.VarChar(36)
+ tenantId String @db.VarChar(64)
+ applicationKey String @db.VarChar(64)
+ provider String @db.VarChar(16)
+ version Int
+ config Json
+ secretFields Json
+ secretsCipher String? @db.Text
+ createdAt DateTime @default(now()) @db.DateTime(3)
+ @@unique([tenantId,applicationKey,provider,version], map: "TenantPaymentRevision_scope_version_key")
+}
+
+model TenantPaymentPolicy {
+ tenantId String @db.VarChar(64)
+ applicationKey String @db.VarChar(64)
+ config Json
+ version Int @default(1)
+ updatedAt DateTime @updatedAt @db.DateTime(3)
+ @@id([tenantId,applicationKey])
+}
+
+model TenantOfficialAccountSetting {
+ tenantId String @db.VarChar(64)
+ applicationKey String @db.VarChar(64)
+ config Json
+ keyCipher String? @db.Text
+ version Int @default(1)
+ updatedAt DateTime @updatedAt @db.DateTime(3)
+ @@id([tenantId,applicationKey])
+}
+
+model TenantPolicyDocument {
+ tenantId String @db.VarChar(64)
+ applicationKey String @db.VarChar(64)
+ kind String @db.VarChar(16)
+ title String @db.VarChar(80)
+ content String @db.MediumText
+ version Int @default(1)
+ currentVersion Int?
+ @@id([tenantId,applicationKey,kind])
+}
+
+model HelpCategory {
+ tenantId String @db.VarChar(64)
+ applicationKey String @db.VarChar(64)
+ id String @db.VarChar(36)
+ application TenantApplication @relation(fields:[tenantId,applicationKey],references:[tenantId,applicationKey],onDelete:Cascade)
+ name String @db.VarChar(80)
+ sort Int @default(0)
+ enabled Boolean @default(true)
+ version Int @default(1)
+ createdAt DateTime @default(now()) @db.DateTime(3)
+ updatedAt DateTime @updatedAt @db.DateTime(3)
+ deletedAt DateTime? @db.DateTime(3)
+ articles HelpArticle[]
+ @@id([tenantId,applicationKey,id])
+ @@index([tenantId,applicationKey,deletedAt,enabled,sort],map:"HelpCategory_listing")
+}
+
+model HelpArticle {
+ tenantId String @db.VarChar(64)
+ applicationKey String @db.VarChar(64)
+ id String @db.VarChar(36)
+ categoryId String @db.VarChar(36)
+ category HelpCategory @relation(fields:[tenantId,applicationKey,categoryId],references:[tenantId,applicationKey,id],onDelete:Restrict)
+ title String @db.VarChar(120)
+ content String @db.MediumText
+ searchText String @db.MediumText
+ sort Int @default(0)
+ enabled Boolean @default(true)
+ version Int @default(1)
+ createdAt DateTime @default(now()) @db.DateTime(3)
+ updatedAt DateTime @updatedAt @db.DateTime(3)
+ deletedAt DateTime? @db.DateTime(3)
+ @@id([tenantId,applicationKey,id])
+ @@index([tenantId,applicationKey,categoryId,deletedAt,enabled,sort],map:"HelpArticle_listing")
+}
+
+model OfficialAccountTask {
+ id String @id @db.VarChar(36)
+ tenantId String @db.VarChar(64)
+ applicationKey String @db.VarChar(64)
+ requestKey String @db.VarChar(64)
+ kind String @db.VarChar(16)
+ settingsVersion Int
+ appId String @db.VarChar(32)
+ payload Json
+ recipientCipher String? @db.Text
+ status String @default("PENDING") @db.VarChar(16)
+ errorCode String? @db.VarChar(64)
+ claimToken String? @db.VarChar(36)
+ attempts Int @default(0)
+ nextAttemptAt DateTime @default(now()) @db.DateTime(3)
+ createdAt DateTime @default(now()) @db.DateTime(3)
+ updatedAt DateTime @updatedAt @db.DateTime(3)
+ expiresAt DateTime @db.DateTime(3)
+ @@unique([tenantId,applicationKey,requestKey], map:"OfficialAccountTask_request_key")
+ @@index([status,createdAt], map:"OfficialAccountTask_pending_idx")
+}
+
+model TenantPolicyRevision {
+ tenantId String @db.VarChar(64)
+ applicationKey String @db.VarChar(64)
+ kind String @db.VarChar(16)
+ version Int
+ title String @db.VarChar(80)
+ content String @db.MediumText
+ publishedAt DateTime @db.DateTime(3)
+ @@id([tenantId,applicationKey,kind,version])
+}
+
+model TenantMiniProgramSetting {
+ uploadKeyCipher String? @db.Text
+ tenantId String @db.VarChar(64)
+ applicationKey String @db.VarChar(64)
+ config Json
+ keyCipher String? @db.Text
+ version Int @default(1)
+ updatedAt DateTime @updatedAt @db.DateTime(3)
+ @@id([tenantId,applicationKey])
+}
+
+model TenantMiniAdSetting {
+ tenantId String @db.VarChar(64)
+ applicationKey String @db.VarChar(64)
+ appId String @db.VarChar(18)
+ config Json
+ version Int @default(1)
+ updatedAt DateTime @updatedAt @db.DateTime(3)
+ @@id([tenantId,applicationKey])
+}
+
+model TenantMiniUploadTask {
+ id String @id @db.VarChar(36)
+ tenantId String @db.VarChar(64)
+ applicationKey String @db.VarChar(64)
+ instanceId String @db.VarChar(191)
+ selection Json
+ payload Json
+ settingsVersion Int
+ jobId String? @db.VarChar(191)
+ status String @db.VarChar(16)
+ progress Int @default(0)
+ message String @default("") @db.VarChar(300)
+ qrCode String? @db.MediumText
+ version Int @default(1)
+ attemptedAt DateTime? @db.DateTime(3)
+ deletedAt DateTime? @db.DateTime(3)
+ createdAt DateTime @default(now()) @db.DateTime(3)
+ updatedAt DateTime @updatedAt @db.DateTime(3)
+ @@index([tenantId,applicationKey,createdAt], map: "TenantMiniUploadTask_scope_idx")
+}
+
+model ConsumerExternalIdentity {
+ tenantId String @db.VarChar(64)
+ applicationKey String @db.VarChar(64)
+ provider String @db.VarChar(16)
+ appId String @db.VarChar(64)
+ subjectHash String @db.VarChar(64)
+ userId String @db.VarChar(64)
+ identityCipher String @db.Text
+ createdAt DateTime @default(now()) @db.DateTime(3)
+ @@id([tenantId,applicationKey,provider,appId,subjectHash])
+ @@index([tenantId,applicationKey,userId], map: "ConsumerExternalIdentity_user_idx")
+}
+
+model StandaloneBenefitCatalog {
+ tenantId String @db.VarChar(64)
+ applicationKey String @db.VarChar(64)
+ config Json
+ version Int @default(1)
+ @@id([tenantId,applicationKey])
+}
+model StandaloneBenefitHolding {
+ id String @db.Char(36)
+ tenantId String @db.VarChar(64)
+ applicationKey String @db.VarChar(64)
+ userId String @db.VarChar(64)
+ consumer ConsumerProfile @relation(fields:[tenantId,applicationKey,userId],references:[tenantId,applicationKey,userId],onDelete:Restrict)
+ packageId String @db.Char(36)
+ packageName String @db.VarChar(64)
+ total Int
+ remaining Int
+ expiresAt DateTime? @db.DateTime(3)
+ version Int @default(1)
+ createdAt DateTime @default(now()) @db.DateTime(3)
+ entries StandaloneBenefitEntry[]
+ @@id([tenantId,applicationKey,id])
+ @@unique([tenantId,applicationKey,userId,id],map:"StandaloneBenefit_holding_scope")
+ @@index([tenantId,applicationKey,createdAt],map:"StandaloneBenefit_holding_time")
+}
+model StandaloneBenefitEntry {
+ id String @db.Char(36)
+ tenantId String @db.VarChar(64)
+ applicationKey String @db.VarChar(64)
+ userId String @db.VarChar(64)
+ holdingId String @db.Char(36)
+ holding StandaloneBenefitHolding @relation(fields:[tenantId,applicationKey,userId,holdingId],references:[tenantId,applicationKey,userId,id],onDelete:Restrict)
+ requestId String @db.Char(36)
+ payloadHash String @db.Char(64)
+ kind String @db.VarChar(12)
+ delta Int
+ afterAmount Int
+ holdingVersion Int
+ actor String @db.VarChar(64)
+ reason String @db.VarChar(200)
+ createdAt DateTime @default(now()) @db.DateTime(3)
+ @@id([tenantId,applicationKey,id])
+ @@unique([tenantId,applicationKey,requestId],map:"StandaloneBenefit_request")
+ @@index([tenantId,applicationKey,createdAt],map:"StandaloneBenefit_entry_time")
+}

@@ -1,0 +1,1 @@
+export default defineEventHandler(event=>useRuntimeConfig().public.installationMode?{ready:true,stage:'installation'}:proxyRequest(event,String(useRuntimeConfig().apiInternalBase).replace(/\/api\/v1\/?$/,'')+'/health'))

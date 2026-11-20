@@ -1,0 +1,5 @@
+* text=auto eol=lf
+*.png binary
+*.tgz binary
+# Preserve the original checksums of migrations already used by the compatibility host.
+prisma/migrations/20261120*/migration.sql -text

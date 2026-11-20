@@ -1,0 +1,4 @@
+<script setup lang="ts">
+const branding=useSiteBranding(),site=branding.resolvedSite||branding.site
+</script>
+<template><div v-if="site&&(site.copyright||site.filing.icpNumber||site.filing.policeNumber)" class="site-legal-footer flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs leading-6 text-muted"><span v-if="site.copyright">{{site.copyright}}</span><component :is="site.filing.icpLink?'a':'span'" v-if="site.filing.icpNumber" :href="site.filing.icpLink||undefined" :target="site.filing.icpLink?'_blank':undefined" :rel="site.filing.icpLink?'noopener noreferrer':undefined">{{site.filing.icpNumber}}</component><component :is="site.filing.policeLink?'a':'span'" v-if="site.filing.policeNumber" :href="site.filing.policeLink||undefined" :target="site.filing.policeLink?'_blank':undefined" :rel="site.filing.policeLink?'noopener noreferrer':undefined">{{site.filing.policeNumber}}</component></div></template>

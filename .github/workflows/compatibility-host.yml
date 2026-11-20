@@ -1,0 +1,29 @@
+name: 兼容宿主验收
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      QA_HEADED: '1'
+      LIBGL_ALWAYS_SOFTWARE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: 安装锁定的包管理器
+        run: npm install --global pnpm@11.25.0
+      - name: 准备隔离数据库与浏览器
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mysql-server xvfb
+          pnpm dlx playwright@1.64.1 install --with-deps chromium
+      - name: 运行兼容宿主完整验收
+        run: xvfb-run -a bash tests/verify-linux.sh

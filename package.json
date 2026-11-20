@@ -1,0 +1,74 @@
+{
+  "name": "@qicore/standalone",
+  "version": "0.1.0",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "packageManager": "pnpm@11.25.0",
+  "exports": {
+    ".": "./src/host.mjs",
+    "./sdk": {
+      "types": "./src/sdk.d.mts",
+      "default": "./src/sdk.mjs"
+    },
+    "./layer": "./web/nuxt.config.ts",
+    "./identity": "./src/identity.mjs",
+    "./installer": "./src/installer.mjs"
+  },
+  "scripts": {
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate deploy",
+    "admin:create": "node --env-file-if-exists=.env scripts/admin.mjs",
+    "dev:api": "node --env-file-if-exists=.env src/main.mjs",
+    "dev:web": "nuxt dev web",
+    "build": "prisma generate && nuxt build web",
+    "test": "node --test tests/*.test.mjs",
+    "install:link": "node --env-file-if-exists=.env scripts/install-link.mjs",
+    "dev": "node enterprise/scripts/development/run.mjs --port 3700 --state .local/enterprise-preview-3700",
+    "dev:stop": "node enterprise/scripts/development/stop.mjs .local/enterprise-preview-3700",
+    "enterprise:prepare": "pnpm --dir enterprise install --frozen-lockfile",
+    "enterprise:build": "pnpm --dir enterprise build",
+    "enterprise:typecheck": "pnpm --dir enterprise typecheck"
+  },
+  "dependencies": {
+    "@nestjs/core": "11.2.3",
+    "@nestjs/common": "11.2.3",
+    "@nestjs/platform-express": "11.2.3",
+    "@prisma/client": "6.19.3",
+    "prisma": "6.19.3",
+    "reflect-metadata": "0.2.2",
+    "rxjs": "7.8.2",
+    "express": "5.2.1",
+    "zod": "4.4.3",
+    "nuxt": "4.5.2",
+    "@nuxt/ui": "4.10.0",
+    "vue": "3.5.42",
+    "tailwindcss": "4.3.1",
+    "@iconify-json/lucide": "1.2.114",
+    "sharp": "0.35.5",
+    "file-type": "21.3.4",
+    "qiniu": "7.15.2",
+    "cos-nodejs-sdk-v5": "3.0.0",
+    "ali-oss": "6.23.0",
+    "sanitize-html": "2.17.7",
+    "marked": "17.0.6",
+    "@wangeditor/editor": "5.1.23"
+  },
+  "devDependencies": {
+    "@types/node": "24.10.2",
+    "typescript": "5.9.3",
+    "vue-tsc": "3.3.9"
+  },
+  "files": [
+    "src",
+    "prisma",
+    "web/app",
+    "web/public",
+    "web/server",
+    "web/nuxt.config.ts",
+    "scripts",
+    "examples"
+  ]
+}

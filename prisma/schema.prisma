@@ -1,0 +1,372 @@
+generator client {
+  provider = "prisma-client-js"
+  output = "../.generated/client"
+}
+datasource db {
+  provider = "mysql"
+  url = env("DATABASE_URL")
+}
+model Role {
+  id String @id @db.VarChar(48)
+  title String
+  permissions Json
+  enabled Boolean @default(true)
+  version Int @default(1)
+  createdAt DateTime? @default(now()) @db.DateTime(3)
+  deletedAt DateTime? @db.DateTime(3)
+  accounts Account[]
+  @@map("qc_roles")
+}
+model Account {
+  id String @id @default(uuid()) @db.Char(36)
+  login String @unique @db.VarChar(80)
+  displayName String
+  passwordHash String
+  enabled Boolean @default(true)
+  avatar String? @db.MediumText
+  phone String @default("") @db.VarChar(32)
+  allowMultipleSessions Boolean @default(true)
+  version Int @default(1)
+  createdAt DateTime? @default(now()) @db.DateTime(3)
+  deletedAt DateTime? @db.DateTime(3)
+  roleId String @db.VarChar(48)
+  role Role @relation(fields: [roleId], references: [id])
+  sessions Session[]
+  @@map("qc_accounts")
+}
+model Session {
+  digest String @id @db.Char(64)
+  accountId String @db.Char(36)
+  account Account @relation(fields:[accountId],references:[id],onDelete:Cascade)
+  expiresAt DateTime
+  @@index([expiresAt])
+  @@map("qc_sessions")
+}
+
+model DirectoryRequest {
+  actorId String @db.Char(36)
+  requestId String @db.Char(36)
+  fingerprint String @db.VarChar(191)
+  subjectId String @db.VarChar(48)
+  @@id([actorId,requestId])
+  @@map("qc_directory_requests")
+}
+
+model CoreStorageSetting {
+  id String @id @db.VarChar(32)
+  version Int @default(1)
+  activeRevisionId String @db.VarChar(36)
+  providers Json
+ @@map("qc_storage_settings")
+}
+
+model CoreStorageRevision {
+  id String @id @db.VarChar(36)
+  provider String @db.VarChar(16)
+  config Json
+  secretsCipher String? @db.Text
+  createdAt DateTime @default(now()) @db.DateTime(3)
+ @@map("qc_storage_revisions")
+}
+
+model CoreMaterialGroup {
+ id String @id @db.VarChar(36)
+ scopeKey String @db.VarChar(64)
+ kind String @db.VarChar(16)
+ name String @db.VarChar(40)
+ version Int @default(1)
+ createdAt DateTime @default(now()) @db.DateTime(3)
+ materials CoreMaterial[]
+ @@unique([scopeKey,kind,name])
+ @@unique([scopeKey,kind,id])
+ @@map("qc_material_groups")
+}
+
+model CoreMaterial {
+ id String @id @db.VarChar(36)
+ scopeKey String @db.VarChar(64)
+ kind String @db.VarChar(16)
+ name String @db.VarChar(180)
+ mime String @db.VarChar(100)
+ bytes Int
+ hash String @db.VarChar(64)
+ provider String @db.VarChar(16)
+ revisionId String @db.VarChar(36)
+ objectKey String @unique @db.VarChar(256)
+ ownerId String @db.VarChar(64)
+ groupId String? @db.VarChar(36)
+ group CoreMaterialGroup? @relation(fields:[scopeKey,kind,groupId],references:[scopeKey,kind,id],onDelete:Restrict,onUpdate:Restrict)
+ status String @db.VarChar(16)
+ version Int @default(1)
+ createdAt DateTime @default(now()) @db.DateTime(3)
+ deletedAt DateTime? @db.DateTime(3)
+ @@index([scopeKey,kind,deletedAt,createdAt])
+ @@map("qc_materials")
+}
+
+model CoreAuditEvent {
+  id String @id @db.VarChar(36)
+  actor String @db.VarChar(64)
+  action String @db.VarChar(64)
+  details Json
+  createdAt DateTime @default(now()) @db.DateTime(3)
+  @@index([createdAt])
+  @@map("qc_audit_events")
+}
+
+model SiteSetting {
+  id        String   @id @db.VarChar(16)
+  config    Json
+  version   Int      @default(1) @db.UnsignedInt
+  updatedAt DateTime @updatedAt @db.DateTime(3)
+  @@map("qc_site_settings")
+}
+
+model CoreHelpCategory {
+  scope String @db.VarChar(100)
+  id String @db.Char(36)
+  name String @db.VarChar(80)
+  sort Int @default(0)
+  enabled Boolean @default(true)
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.DateTime(3)
+  updatedAt DateTime @updatedAt @db.DateTime(3)
+  deletedAt DateTime? @db.DateTime(3)
+  articles CoreHelpArticle[]
+  @@id([scope, id])
+  @@index([scope, deletedAt, enabled, sort], map: "qc_help_categories_listing")
+  @@map("qc_help_categories")
+}
+
+model CoreHelpArticle {
+  scope String @db.VarChar(100)
+  id String @db.Char(36)
+  categoryId String @db.Char(36)
+  category CoreHelpCategory @relation(fields:[scope, categoryId], references:[scope, id], onDelete:Restrict)
+  title String @db.VarChar(120)
+  content String @db.MediumText
+  searchText String @db.MediumText
+  sort Int @default(0)
+  enabled Boolean @default(true)
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.DateTime(3)
+  updatedAt DateTime @updatedAt @db.DateTime(3)
+  deletedAt DateTime? @db.DateTime(3)
+  @@id([scope, id])
+  images CoreHelpImage[]
+  @@index([scope, categoryId, deletedAt, enabled, sort], map: "qc_help_articles_listing")
+  @@map("qc_help_articles")
+}
+
+model CorePolicyRevision {
+  scope String @db.VarChar(100)
+  kind String @db.VarChar(16)
+  version Int
+  title String @db.VarChar(80)
+  content String @db.MediumText
+  publishedAt DateTime @default(now()) @db.DateTime(3)
+  images CorePolicyImage[]
+  @@id([scope, kind, version])
+  @@map("qc_policy_revisions")
+}
+
+model CoreContactSettings {
+  scope String @id @db.VarChar(100)
+  config Json
+  version Int @default(1)
+  @@map("qc_contact_settings")
+}
+
+
+model CoreHelpImage {
+  scope String @db.VarChar(100)
+  articleId String @db.Char(36)
+  materialId String @db.Char(36)
+  article CoreHelpArticle @relation(fields:[scope, articleId], references:[scope, id], onDelete:Cascade)
+  @@id([scope, articleId, materialId])
+  @@index([materialId], map: "qc_help_images_lookup")
+  @@map("qc_help_images")
+}
+
+model CorePolicyImage {
+  scope String @db.VarChar(100)
+  kind String @db.VarChar(16)
+  version Int
+  materialId String @db.Char(36)
+  revision CorePolicyRevision @relation(fields:[scope, kind, version], references:[scope, kind, version], onDelete:Cascade)
+  @@id([scope, kind, version, materialId])
+  @@index([materialId], map: "qc_policy_images_lookup")
+  @@map("qc_policy_images")
+}
+
+model CoreConsumerLoginSession {
+  digest String @id @db.Char(64)
+  scope String @db.VarChar(100)
+  userId String @db.VarChar(64)
+  authVersion Int
+  expiresAt DateTime @db.DateTime(3)
+  @@index([scope,userId], map: "qc_consumer_sessions_identity")
+  @@index([expiresAt], map: "qc_consumer_sessions_expiry")
+  @@map("qc_consumer_sessions")
+}
+
+model CoreConsumerSettings {
+  scope String @id @db.VarChar(100)
+  config Json
+  version Int @default(1)
+  @@map("qc_consumer_settings")
+}
+
+model CoreConsumerAuthLimit {
+  key String @id @db.Char(64)
+  count Int
+  expiresAt DateTime @db.DateTime(3)
+  @@index([expiresAt], map: "qc_consumer_throttle_expiry")
+  @@map("qc_consumer_auth_limits")
+}
+
+model CoreConsumerPolicyAcceptance {
+  scope String @db.VarChar(100)
+  userId String @db.VarChar(64)
+  kind String @db.VarChar(16)
+  version Int
+  acceptedAt DateTime @default(now()) @db.DateTime(3)
+  @@id([scope,userId,kind,version])
+  @@map("qc_consumer_policy_acceptance")
+}
+
+model CoreConsumer {
+  scope String @db.VarChar(100)
+  userId String @db.VarChar(64)
+  memberNumber String @db.VarChar(48)
+  nickname String @db.VarChar(64)
+  avatar String? @db.MediumText
+  phone String @default("") @db.VarChar(32)
+  email String @default("") @db.VarChar(254)
+  gender String @default("unknown") @db.VarChar(16)
+  passwordHash String? @db.VarChar(256)
+  enabled Boolean @default(true)
+  deletedAt DateTime? @db.DateTime(3)
+  authVersion Int @default(1)
+  version Int @default(1)
+  firstSeenAt DateTime @default(now()) @db.DateTime(3)
+  lastActivityAt DateTime @default(now()) @db.DateTime(3)
+  growth Int @default(0)
+  paidCents BigInt @default(0)
+  paidOrders Int @default(0)
+  memberLevelId String? @db.VarChar(36)
+  memberLevel CoreMemberLevel? @relation(fields:[scope,memberLevelId], references:[scope,id],onDelete:Restrict,onUpdate:Restrict)
+  memberTags CoreConsumerTag[]
+  @@id([scope,userId])
+  @@unique([scope,memberNumber],map:"qc_consumers_number")
+  @@index([scope,deletedAt,lastActivityAt],map:"qc_consumers_listing")
+  @@map("qc_consumers")
+}
+
+model CoreConsumerCounter {
+  scope String @id @db.VarChar(100)
+  nextNumber Int @default(1)
+  @@map("qc_consumer_counters")
+}
+
+model CoreMemberLevel {
+  scope String @db.VarChar(100)
+  id String @db.VarChar(36)
+  name String @db.VarChar(32)
+  description String @default("") @db.VarChar(200)
+  rank Int
+  upgradeMode String @default("all") @db.VarChar(8)
+  conditions Json
+  benefits Json
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.DateTime(3)
+  updatedAt DateTime @updatedAt @db.DateTime(3)
+  members CoreConsumer[]
+  @@id([scope,id])
+  @@unique([scope,name],map:"qc_member_level_name")
+  @@unique([scope,rank],map:"qc_member_level_rank")
+  @@map("qc_member_levels")
+}
+
+model CoreMemberTag {
+  scope String @db.VarChar(100)
+  id String @db.VarChar(36)
+  name String @db.VarChar(32)
+  description String @default("") @db.VarChar(200)
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.DateTime(3)
+  updatedAt DateTime @updatedAt @db.DateTime(3)
+  members CoreConsumerTag[]
+  @@id([scope,id])
+  @@unique([scope,name],map:"qc_member_tag_name")
+  @@map("qc_member_tags")
+}
+
+model CoreConsumerTag {
+  scope String @db.VarChar(100)
+  userId String @db.VarChar(64)
+  tagId String @db.VarChar(36)
+  consumer CoreConsumer @relation(fields:[scope,userId],references:[scope,userId],onDelete:Restrict,onUpdate:Restrict)
+  tag CoreMemberTag @relation(fields:[scope,tagId],references:[scope,id],onDelete:Restrict,onUpdate:Restrict)
+  @@id([scope,userId,tagId])
+  @@index([scope,tagId],map:"qc_consumer_tag_lookup")
+  @@map("qc_consumer_tags")
+}
+
+model CoreMemberRule {
+  scope String @id @db.VarChar(100)
+  registrationGrowth Int @default(0)
+  purchaseGrowthPerYuan Int @default(0)
+  baseLevel Json?
+  version Int @default(0)
+  @@map("qc_member_rules")
+}
+
+model CoreMemberGrowthEntry {
+  scope String @db.VarChar(100)
+  userId String @db.VarChar(64)
+  requestId String @db.VarChar(64)
+  kind String @db.VarChar(32)
+  payloadHash String @db.Char(64)
+  levelBefore Json
+  levelAfter Json
+  before Int
+  after Int
+  reason String @db.VarChar(200)
+  actor String @db.VarChar(64)
+  createdAt DateTime @default(now()) @db.DateTime(3)
+  @@id([scope,userId,requestId])
+  @@index([scope,userId,createdAt],map:"qc_consumer_growth_listing")
+  @@map("qc_consumer_growth")
+}
+
+model CoreConsumerWallet {
+  scope String @db.VarChar(100)
+  userId String @db.VarChar(64)
+  asset String @db.VarChar(16)
+  amount BigInt @default(0)
+  version Int @default(0)
+  @@id([scope,userId,asset])
+  @@map("qc_consumer_wallets")
+}
+
+model CoreConsumerWalletEntry {
+  scope String @db.VarChar(100)
+  id String @db.VarChar(36)
+  userId String @db.VarChar(64)
+  asset String @db.VarChar(16)
+  kind String @db.VarChar(32)
+  requestId String @db.VarChar(128)
+  payloadHash String @db.Char(64)
+  delta BigInt
+  beforeAmount BigInt
+  afterAmount BigInt
+  reference String @db.VarChar(80)
+  reason String @db.VarChar(200)
+  actor String @db.VarChar(64)
+  createdAt DateTime @default(now()) @db.DateTime(3)
+  @@id([scope,id])
+  @@unique([scope,userId,asset,requestId],map:"qc_consumer_wallet_request")
+  @@index([scope,asset,createdAt],map:"qc_consumer_wallet_listing")
+  @@map("qc_consumer_wallet_entries")
+}

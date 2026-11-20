@@ -1,0 +1,11 @@
+<script setup lang="ts">
+import ConsoleFormActions from '@orangezh1/qisvc-console-ui/components/ConsoleFormActions'
+import ConsoleDialog from './ConsoleDialog.vue'
+const props=defineProps<{modelValue:string;label:string;items:{value:string;label:string;image?:string}[];disabled?:boolean}>()
+const emit=defineEmits<{'update:modelValue':[value:string]}>()
+const open=ref(false),selected=ref('')
+function show(){if(props.disabled)return;selected.value=props.modelValue;open.value=true}
+function confirm(){if(props.disabled)return;emit('update:modelValue',selected.value);open.value=false}
+</script>
+<template><div><button type="button" class="style-picker-trigger" :disabled="disabled" @click="show"><span>{{label}}</span><b>{{items.find(i=>i.value===modelValue)?.label||'选择风格'}}</b><UIcon name="i-lucide-chevron-right"/></button><ConsoleDialog v-model:open="open" :title="label" size="wide"><template #body><div class="style-picker-grid"><button v-for="item in items" :key="item.value" type="button" :class="{selected:selected===item.value}" :aria-pressed="selected===item.value" @click="selected=item.value"><slot name="preview" :item="item"><img v-if="item.image" :src="item.image" :alt="item.label"></slot><span>{{item.label}}</span></button></div></template><template #footer><ConsoleFormActions><UButton color="neutral" variant="outline" @click="open=false">取消</UButton><UButton @click="confirm">确定</UButton></ConsoleFormActions></template></ConsoleDialog></div></template>
+<style scoped>.style-picker-trigger{display:flex;align-items:center;gap:10px;width:100%;font-size:12px;text-align:left}.style-picker-trigger>b{color:var(--ui-primary);font-weight:400;margin-left:auto}.style-picker-grid{padding:20px 24px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.style-picker-grid button{min-width:0;border:1px solid var(--ui-border);border-radius:6px;padding:10px;background:var(--ui-bg-elevated);display:flex;flex-direction:column;align-items:center;gap:10px;font-size:12px}.style-picker-grid button.selected{border-color:var(--ui-primary);outline:1px solid var(--ui-primary)}.style-picker-grid img{width:100%;height:120px;object-fit:contain}@media(max-width:480px){.style-picker-grid{grid-template-columns:1fr}}</style>

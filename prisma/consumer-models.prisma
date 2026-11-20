@@ -1,0 +1,135 @@
+model CoreConsumer {
+  scope String @db.VarChar(100)
+  userId String @db.VarChar(64)
+  memberNumber String @db.VarChar(48)
+  nickname String @db.VarChar(64)
+  avatar String? @db.MediumText
+  phone String @default("") @db.VarChar(32)
+  email String @default("") @db.VarChar(254)
+  gender String @default("unknown") @db.VarChar(16)
+  passwordHash String? @db.VarChar(256)
+  enabled Boolean @default(true)
+  deletedAt DateTime? @db.DateTime(3)
+  authVersion Int @default(1)
+  version Int @default(1)
+  firstSeenAt DateTime @default(now()) @db.DateTime(3)
+  lastActivityAt DateTime @default(now()) @db.DateTime(3)
+  growth Int @default(0)
+  paidCents BigInt @default(0)
+  paidOrders Int @default(0)
+  memberLevelId String? @db.VarChar(36)
+  memberLevel CoreMemberLevel? @relation(fields:[scope,memberLevelId], references:[scope,id],onDelete:Restrict,onUpdate:Restrict)
+  memberTags CoreConsumerTag[]
+  @@id([scope,userId])
+  @@unique([scope,memberNumber],map:"qc_consumers_number")
+  @@index([scope,deletedAt,lastActivityAt],map:"qc_consumers_listing")
+  @@map("qc_consumers")
+}
+
+model CoreConsumerCounter {
+  scope String @id @db.VarChar(100)
+  nextNumber Int @default(1)
+  @@map("qc_consumer_counters")
+}
+
+model CoreMemberLevel {
+  scope String @db.VarChar(100)
+  id String @db.VarChar(36)
+  name String @db.VarChar(32)
+  description String @default("") @db.VarChar(200)
+  rank Int
+  upgradeMode String @default("all") @db.VarChar(8)
+  conditions Json
+  benefits Json
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.DateTime(3)
+  updatedAt DateTime @updatedAt @db.DateTime(3)
+  members CoreConsumer[]
+  @@id([scope,id])
+  @@unique([scope,name],map:"qc_member_level_name")
+  @@unique([scope,rank],map:"qc_member_level_rank")
+  @@map("qc_member_levels")
+}
+
+model CoreMemberTag {
+  scope String @db.VarChar(100)
+  id String @db.VarChar(36)
+  name String @db.VarChar(32)
+  description String @default("") @db.VarChar(200)
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.DateTime(3)
+  updatedAt DateTime @updatedAt @db.DateTime(3)
+  members CoreConsumerTag[]
+  @@id([scope,id])
+  @@unique([scope,name],map:"qc_member_tag_name")
+  @@map("qc_member_tags")
+}
+
+model CoreConsumerTag {
+  scope String @db.VarChar(100)
+  userId String @db.VarChar(64)
+  tagId String @db.VarChar(36)
+  consumer CoreConsumer @relation(fields:[scope,userId],references:[scope,userId],onDelete:Restrict,onUpdate:Restrict)
+  tag CoreMemberTag @relation(fields:[scope,tagId],references:[scope,id],onDelete:Restrict,onUpdate:Restrict)
+  @@id([scope,userId,tagId])
+  @@index([scope,tagId],map:"qc_consumer_tag_lookup")
+  @@map("qc_consumer_tags")
+}
+
+model CoreMemberRule {
+  scope String @id @db.VarChar(100)
+  registrationGrowth Int @default(0)
+  purchaseGrowthPerYuan Int @default(0)
+  baseLevel Json?
+  version Int @default(0)
+  @@map("qc_member_rules")
+}
+
+model CoreMemberGrowthEntry {
+  scope String @db.VarChar(100)
+  userId String @db.VarChar(64)
+  requestId String @db.VarChar(64)
+  kind String @db.VarChar(32)
+  payloadHash String @db.Char(64)
+  levelBefore Json
+  levelAfter Json
+  before Int
+  after Int
+  reason String @db.VarChar(200)
+  actor String @db.VarChar(64)
+  createdAt DateTime @default(now()) @db.DateTime(3)
+  @@id([scope,userId,requestId])
+  @@index([scope,userId,createdAt],map:"qc_consumer_growth_listing")
+  @@map("qc_consumer_growth")
+}
+
+model CoreConsumerWallet {
+  scope String @db.VarChar(100)
+  userId String @db.VarChar(64)
+  asset String @db.VarChar(16)
+  amount BigInt @default(0)
+  version Int @default(0)
+  @@id([scope,userId,asset])
+  @@map("qc_consumer_wallets")
+}
+
+model CoreConsumerWalletEntry {
+  scope String @db.VarChar(100)
+  id String @db.VarChar(36)
+  userId String @db.VarChar(64)
+  asset String @db.VarChar(16)
+  kind String @db.VarChar(32)
+  requestId String @db.VarChar(128)
+  payloadHash String @db.Char(64)
+  delta BigInt
+  beforeAmount BigInt
+  afterAmount BigInt
+  reference String @db.VarChar(80)
+  reason String @db.VarChar(200)
+  actor String @db.VarChar(64)
+  createdAt DateTime @default(now()) @db.DateTime(3)
+  @@id([scope,id])
+  @@unique([scope,userId,asset,requestId],map:"qc_consumer_wallet_request")
+  @@index([scope,asset,createdAt],map:"qc_consumer_wallet_listing")
+  @@map("qc_consumer_wallet_entries")
+}

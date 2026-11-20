@@ -1,0 +1,50 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+@import "../console-ui/console.css";
+@source "..";
+
+@layer base {
+  body { margin: 0; color: var(--ui-text); background: var(--ui-bg); font-family: var(--font-sans); }
+  h1 { font-size: 1.5rem; font-weight: 600; }
+  h2 { font-size: 1.125rem; font-weight: 600; }
+  p { margin: .7rem 0; color: var(--ui-text-muted); }
+  :where(section, form):not([class], [data-slot]) { background: var(--ui-bg); border: 1px solid var(--ui-border); padding: 1.25rem; border-radius: .625rem; }
+  :where(form, label):not([class], [data-slot]) { display: grid; gap: 1rem; }
+  label:not([class], [data-slot]) { gap: .375rem; }
+  :where(input, select, textarea):not([class], [data-slot]) { width: 100%; padding: .5rem .65rem; border: 1px solid var(--ui-border-accented); border-radius: .375rem; background: var(--ui-bg); color: var(--ui-text-highlighted); }
+  :where(.stack, .login) button:not([class], [data-slot], [role]) { background: var(--action, var(--ui-primary)); color: white; border-radius: .375rem; padding: .5rem .9rem; cursor: pointer; }
+  :where(.stack, .login) button:disabled { opacity: .55; }
+  :focus-visible { outline: 2px solid var(--ui-primary); outline-offset: 2px; }
+}
+.stack { display: grid; gap: 1rem; }
+.login { min-height: 100dvh; display: grid; place-items: center; padding: 1rem; }
+.login form { width: min(100%, 24rem); }
+
+.qisvc-console-shell .qisvc-console-page-heading {
+  min-height: 60px;
+  align-items: flex-start;
+  margin: 0 0 20px;
+}
+.core-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: 1rem; }
+.core-metrics > a > div { height: 100%; }
+.core-detail-grid { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 1.5rem; align-items: start; }
+.core-facts { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 1rem 1.5rem; font-size: .875rem; }
+.core-facts dt { color: var(--ui-text-muted); }
+.core-facts dd { overflow-wrap: anywhere; }
+form.core-editor { padding: 0; border: 0; background: transparent; }
+section.qisvc-data-table { padding: 0; }
+@media(max-width: 760px) { .core-detail-grid { grid-template-columns: minmax(0, 1fr); } }
+
+.core-frame-fill .qisvc-console-panel { height: 100dvh; min-height: 0; overflow: hidden; }
+.core-frame-fill .qisvc-console-panel-body { min-height: 0; overflow: hidden !important; }
+.core-frame-fill .qisvc-console-stage { height: 100%; min-height: 0; }
+.core-frame-fill .qisvc-console-page-heading { flex-shrink: 0; }
+
+/* The enterprise menu highlights its current link; toggles only disclose children. */
+.qisvc-console-sidebar-nav .qisvc-console-sidebar-group-trigger {
+  color: var(--ui-text); background: transparent; font-weight: 400;
+}
+@media (hover:hover) {
+  .qisvc-console-sidebar-nav .qisvc-console-sidebar-group-trigger:hover { background: var(--ui-bg-elevated); }
+}

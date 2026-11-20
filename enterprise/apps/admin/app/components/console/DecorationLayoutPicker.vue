@@ -1,0 +1,7 @@
+<script setup lang="ts">
+import {galleryLayouts} from '../../../../api/src/core/decoration-options.mjs'
+defineProps<{modelValue:string;disabled?:boolean}>()
+defineEmits<{'update:modelValue':[value:string]}>()
+</script>
+<template><div class="layout-picker"><span class="layout-caption">选择模板</span><div class="layout-options"><button v-for="layout in galleryLayouts" :key="layout.key" type="button" :class="{selected:modelValue===layout.key}" :aria-pressed="modelValue===layout.key" :aria-label="layout.label" :disabled="disabled" @click="$emit('update:modelValue',layout.key)"><span class="niu-layout-icon" aria-hidden="true">{{String.fromCodePoint(parseInt(layout.icon,16))}}</span><span>{{layout.label}}</span></button></div></div></template>
+<style scoped>@font-face{font-family:NiuDecorationIcons;src:url('/decoration/niucloud-icons.woff2') format('woff2');font-display:block}.layout-caption{font-size:12px;display:block;margin-bottom:12px}.layout-options{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.layout-options button{padding:12px 3px;display:grid;justify-items:center;gap:8px;border:1px solid var(--ui-border);border-radius:6px;font-size:11px;white-space:nowrap}.layout-options button.selected{border-color:var(--ui-primary);color:var(--ui-primary);background:color-mix(in srgb,var(--ui-primary) 5%,var(--ui-bg))}.niu-layout-icon{font-family:NiuDecorationIcons!important;font-size:24px;font-weight:400;line-height:1}</style>

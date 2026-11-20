@@ -1,0 +1,9 @@
+{
+  "format": "qicore-database-plan-v1",
+  "packageKey": "frm_cdm43f43e7yhk5jd",
+  "fromVersion": "0.1.3",
+  "version": "0.1.4",
+  "beforeSchemaSha256": "701de5dac9581e85fd5e6129c50f7a2e4e9f4d2182988065c2bc33657d827aa3",
+  "afterSchemaSha256": "701de5dac9581e85fd5e6129c50f7a2e4e9f4d2182988065c2bc33657d827aa3",
+  "migrations": []
+}

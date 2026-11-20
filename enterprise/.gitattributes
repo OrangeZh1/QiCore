@@ -1,0 +1,10 @@
+# Dependency patch hashes must match on Windows and Linux. A single-space line
+# is a required empty context line in a unified diff, not source whitespace.
+patches/*.patch text eol=lf whitespace=-blank-at-eol
+
+# Signed migration digests must use the same bytes on Windows and Linux.
+apps/api/prisma/** text eol=lf
+
+# Frozen public closeout inputs keep their recorded byte hashes on every host.
+config/release-baselines/qicore-0.1.6-initial-release.json text eol=lf
+docs/evidence/release-20261101-017-customer/INSTALL.md text eol=lf

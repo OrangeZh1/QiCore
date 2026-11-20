@@ -1,0 +1,90 @@
+import assert from 'node:assert/strict'
+import {verifyCountEntitlementWrites} from './enterprise-count-entitlement.check.mjs'
+import {createRequire} from 'node:module'
+
+const {QA_ORIGIN, QA_ADMIN_LOGIN, QA_ADMIN_PASSWORD, QA_CHROMIUM, QA_HEADED, QA_PLAYWRIGHT_PACKAGE} = process.env
+if (!QA_ORIGIN || !QA_ADMIN_LOGIN || !QA_ADMIN_PASSWORD) throw Error('需要企业验收地址与隔离管理员账号')
+const origin = new URL(QA_ORIGIN)
+if (!['127.0.0.1','localhost','[::1]'].includes(origin.hostname)) throw Error('浏览器验收需连接执行端 loopback')
+const {chromium} = createRequire(QA_PLAYWRIGHT_PACKAGE || import.meta.url)('playwright')
+const browser = await chromium.launch({headless:QA_HEADED !== '1',channel:process.env.QA_BROWSER_CHANNEL || 'chromium',executablePath:QA_CHROMIUM})
+async function verify() {
+  const context=await browser.newContext({baseURL:origin.origin,viewport:{width:1440,height:900}})
+  const login=await context.request.post('/api/v1/admin/auth/login',{headers:{origin:origin.origin,'X-Console-Portal':'tenant'},data:{username:QA_ADMIN_LOGIN,password:QA_ADMIN_PASSWORD,portal:'tenant'}})
+  assert.equal(login.status(),200,'企业后台真实登录')
+  const page=await context.newPage()
+  const errors=[]
+  page.on('pageerror',error=>errors.push(error.message))
+  const retired=await context.request.get('/tenant/roles',{maxRedirects:0})
+  assert.equal(retired.status(),404,'旧多租户页面不作为入口')
+  const frame=page.locator('.qisvc-console-shell')
+  async function checkRoute(path,title,activePath) {
+    const resp=await page.goto(path)
+    assert.equal(resp.status(),200,path)
+    assert.ok((await resp.text()).includes('<title>'+title+' · '), '首个 HTML 标签标题 '+path)
+    assert.equal(new URL(page.url()).pathname,activePath)
+    await page.getByRole('button',{name:/切换(深|浅)色模式/}).waitFor()
+    await frame.getByRole('heading',{name:title,exact:true}).first().waitFor()
+    const nav = frame.locator('.qisvc-console-sidebar-nav')
+    const active = nav.locator('a[data-active="true"]')
+    assert.equal(await active.count(),1,'侧栏唯一选中 '+path)
+    assert.equal(await active.getAttribute('href'),activePath)
+    assert.equal(await frame.getByText('选择租户站点',{exact:true}).count(),0)
+    assert.equal(await nav.getByText('框架与应用',{exact:true}).count(),0)
+    return nav
+  }
+  await checkRoute('/admin','工作台','/admin/workbench')
+  await frame.getByRole('heading',{name:'站点概览',exact:true}).waitFor()
+  assert.equal(await frame.locator('dt').filter({hasText:'当前账号'}).locator('..').locator('dd').innerText(),QA_ADMIN_LOGIN)
+  if(process.env.QA_DISPOSABLE==='1'){
+    assert.equal(await page.title(),'工作台 · QiCore')
+    assert.doesNotMatch(await frame.innerText(),/企业后台|企业管理后台|企业管理员|本企业|租户后台/)
+  }
+  const nav = await checkRoute('/admin/roles','角色','/admin/roles')
+  const group=nav.getByRole('button',{name:'权限管理',exact:true})
+  await page.waitForFunction(()=>document.querySelector('.qisvc-console-sidebar-nav a[href="/admin/roles"]')?.getBoundingClientRect().height>0)
+  assert.equal(await group.getAttribute('aria-expanded'),'true')
+  await page.mouse.move(1000,700)
+  assert.equal(await group.evaluate(el=>getComputedStyle(el).backgroundColor),'rgba(0, 0, 0, 0)','展开的分组没有选中底色')
+  assert.ok((await frame.locator('.qisvc-console-breadcrumbs').innerText()).includes('角色'))
+  await frame.getByRole('button',{name:'新增角色',exact:true}).click()
+  const drawer=page.getByRole('dialog',{name:'新增角色'})
+  await drawer.getByRole('textbox',{name:'角色名称'}).waitFor()
+  assert.equal(await drawer.getByLabel('角色标识').count(),0)
+  await drawer.getByRole('button',{name:'取消'}).click()
+  await nav.getByRole('link',{name:'管理员',exact:true}).click()
+  await page.waitForURL(u=>u.pathname==='/admin/administrators')
+  await page.waitForFunction(()=>document.title.startsWith('管理员 · '))
+  assert.equal(await nav.locator('a[data-active="true"]').getAttribute('href'),'/admin/administrators')
+  const reload=await page.reload()
+  assert.ok((await reload.text()).includes('<title>管理员 · '))
+  await page.getByRole('button',{name:/切换(深|浅)色模式/}).waitFor()
+  await frame.locator('a[href="/admin/profile#password"]').first().click()
+  await page.waitForURL(u=>u.pathname==='/admin/profile' && u.hash==='#password')
+  await page.getByRole('textbox',{name:'昵称'}).waitFor()
+  const current=page.getByLabel('当前密码',{exact:true})
+  await current.waitFor()
+  await page.waitForFunction(()=>document.activeElement?.id === 'current-password')
+  await page.setViewportSize({width:390,height:844})
+  const mobileResponse=await page.goto('/admin/roles')
+  assert.equal(mobileResponse.status(),200)
+  assert.ok((await mobileResponse.text()).includes('<title>角色 · '))
+  await page.getByRole('button',{name:/切换(深|浅)色模式/}).waitFor()
+  await page.getByRole('button',{name:'打开导航'}).click()
+  const mobile=page.getByRole('dialog').locator('.qisvc-console-sidebar-nav')
+  await mobile.getByRole('link',{name:'角色',exact:true}).waitFor()
+  assert.equal(await mobile.locator('a[data-active="true"]').count(),1)
+  assert.equal(await mobile.locator('a[data-active="true"]').getAttribute('href'),'/admin/roles')
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true)
+  assert.deepEqual(errors,[])
+  if(process.env.QA_DISPOSABLE==='1'){
+    const fixture=new URL(process.env.DATABASE_URL)
+    assert.ok(['localhost','127.0.0.1','[::1]'].includes(fixture.hostname)&&fixture.pathname.startsWith('/qc_fixture_'))
+    const testPage=await context.newPage()
+    try{await testPage.setViewportSize({width:1440,height:900});await verifyCountEntitlementWrites(testPage, QA_ORIGIN, {disposable:true})}finally{await testPage.close()}
+    console.log('PASS 通过企业原页发放与核销服务权益，余额和两条流水均与真实数据库一致')
+  }
+  await context.close()
+  console.log('PASS 单企业工作台、企业原版账号/角色、本人资料与改密入口、首屏标题与唯一菜单选中态')
+}
+try {await verify()} finally {await browser.close()}

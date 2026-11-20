@@ -1,0 +1,8 @@
+{
+  "type": "module",
+  "imports": {
+    "#qicore/application-catalog": "./applications/installed-runtime.mjs",
+    "#qicore/application-runtime": "./applications/installed-runtime.mjs",
+    "#qicore/application-permissions": "./applications/installed-runtime.mjs"
+  }
+}

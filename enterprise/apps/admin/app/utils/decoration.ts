@@ -1,0 +1,6 @@
+import type {DecorationApplicationAssets,DecorationApplicationComponent,DecorationLink,DecorationScheme,DecorationRoute} from '../../../api/src/core/decoration-types'
+export type {DecorationApplicationAssets,DecorationApplicationComponent,DecorationLink,DecorationScheme,DecorationRoute}
+export type DecorationRecord={id:string;source?:'system'|'tenant';kind?:'scheme'|'template';coverId?:string|null;groupId?:string|null;name:string;scheme:DecorationScheme;updatedAt:string}
+export type DecorationView={assets?:DecorationApplicationAssets;components?:DecorationApplicationComponent[];applicationKey:string|null;applications:{key:string;name:string}[];targets:DecorationRoute[];defaults?:DecorationScheme|null;groups:{id:string;name:string}[];canWrite:boolean;version:number;current?:DecorationRecord|null;currentSaved?:boolean;schemes:DecorationRecord[];templates:DecorationRecord[];systemTemplates?:DecorationRecord[];activeId:string|null;publishedAt:string|null;published:DecorationScheme|null}
+export const decorationClone=<T,>(value:T):T=>JSON.parse(JSON.stringify(value))
+export const decorationEditorUrl=(id:string,application:string)=>'/admin/decoration-editor?scheme='+encodeURIComponent(id)+'&application='+encodeURIComponent(application)

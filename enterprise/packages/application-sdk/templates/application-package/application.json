@@ -1,0 +1,8 @@
+{
+  "format": "qicore-application-v1",
+  "key": "example-app",
+  "packageKey": "app_example",
+  "version": "0.1.0",
+  "name": "示例应用",
+  "pendingTasks": []
+}

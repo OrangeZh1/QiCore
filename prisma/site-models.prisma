@@ -1,0 +1,7 @@
+model SiteSetting {
+  id        String   @id @db.VarChar(16)
+  config    Json
+  version   Int      @default(1) @db.UnsignedInt
+  updatedAt DateTime @updatedAt @db.DateTime(3)
+  @@map("qc_site_settings")
+}

@@ -1,0 +1,14 @@
+diff --git a/dist/pages/runtime/plugins/router.js b/dist/pages/runtime/plugins/router.js
+--- a/dist/pages/runtime/plugins/router.js
++++ b/dist/pages/runtime/plugins/router.js
+@@ -189,8 +189,8 @@
+ 			if (import.meta.server) delete nuxtApp._middlewareTo;
+ 			await nuxtApp.callHook("page:loading:end");
+ 		});
+-		router.afterEach((to) => {
+-			if (to.matched.length === 0 && !error.value) return nuxtApp.runWithContext(() => showError(createError({
++		router.afterEach((to, _from, failure) => {
++			if (!failure && to.matched.length === 0 && !error.value) return nuxtApp.runWithContext(() => showError(createError({
+ 				status: 404,
+ 				fatal: false,
+ 				statusText: `Page not found: ${to.fullPath}`,

@@ -1,0 +1,155 @@
+{
+  "name": "@orangezh1/qisvc-console-ui",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "files": [
+    "styles",
+    "components",
+    "types"
+  ],
+  "exports": {
+    "./styles.css": "./styles/console.css",
+    "./components/AuthLoginShell": {
+      "types": "./types/AuthLoginShell.d.ts",
+      "import": "./components/AuthLoginShell.vue"
+    },
+    "./components/ConsoleActionConfirmationDialog": {
+      "types": "./types/ConsoleActionConfirmationDialog.d.ts",
+      "import": "./components/ConsoleActionConfirmationDialog.vue"
+    },
+    "./components/ConsoleEmptyState": {
+      "types": "./types/ConsoleEmptyState.d.ts",
+      "import": "./components/ConsoleEmptyState.vue"
+    },
+    "./components/ConsoleDataTable": {
+      "types": "./types/ConsoleDataTable.d.ts",
+      "import": "./components/ConsoleDataTable.vue"
+    },
+    "./components/ConsoleErrorState": {
+      "types": "./types/ConsoleErrorState.d.ts",
+      "import": "./components/ConsoleErrorState.vue"
+    },
+    "./components/ConsoleLoadingState": {
+      "types": "./types/ConsoleLoadingState.d.ts",
+      "import": "./components/ConsoleLoadingState.vue"
+    },
+    "./components/ConsolePageHeading": {
+      "types": "./types/ConsolePageHeading.d.ts",
+      "import": "./components/ConsolePageHeading.vue"
+    },
+    "./components/ConsolePagination": {
+      "types": "./types/ConsolePagination.d.ts",
+      "import": "./components/ConsolePagination.vue"
+    },
+    "./components/ConsoleShell": {
+      "types": "./types/ConsoleShell.d.ts",
+      "import": "./components/ConsoleShell.vue"
+    },
+    "./components/ConsoleSidebarRail": {
+      "types": "./types/ConsoleSidebarRail.d.ts",
+      "import": "./components/ConsoleSidebarRail.vue"
+    },
+    "./components/ConsoleSidebarLink": {
+      "types": "./types/ConsoleSidebarLink.d.ts",
+      "import": "./components/ConsoleSidebarLink.vue"
+    },
+    "./components/ConsoleSidebarGroup": {
+      "types": "./types/ConsoleSidebarGroup.d.ts",
+      "import": "./components/ConsoleSidebarGroup.vue"
+    },
+    "./components/ConsoleStatusCard": {
+      "types": "./types/ConsoleStatusCard.d.ts",
+      "import": "./components/ConsoleStatusCard.vue"
+    },
+    "./components/ConsoleInput": {
+      "types": "./types/ConsoleInput.d.ts",
+      "import": "./components/ConsoleInput.vue"
+    },
+    "./components/ConsoleListSearch": {
+      "types": "./types/ConsoleListSearch.d.ts",
+      "import": "./components/ConsoleListSearch.vue"
+    },
+    "./components/ConsoleListFilters": {
+      "types": "./types/ConsoleListFilters.d.ts",
+      "import": "./components/ConsoleListFilters.vue"
+    },
+    "./components/ConsoleListDateRange": {
+      "types": "./types/ConsoleListDateRange.d.ts",
+      "import": "./components/ConsoleListDateRange.vue"
+    },
+    "./components/ConsoleFormActions": {
+      "types": "./types/ConsoleFormActions.d.ts",
+      "import": "./components/ConsoleFormActions.vue"
+    },
+    "./components/ConsoleSettingsField": {
+      "types": "./types/ConsoleSettingsField.d.ts",
+      "import": "./components/ConsoleSettingsField.vue"
+    },
+    "./components/ConsoleThemeToggle": {
+      "types": "./types/ConsoleThemeToggle.d.ts",
+      "import": "./components/ConsoleThemeToggle.vue"
+    },
+    "./components/ConsoleAvatar": {
+      "types": "./types/ConsoleAvatar.d.ts",
+      "import": "./components/ConsoleAvatar.vue"
+    },
+    "./components/ConsoleUserMenu": {
+      "types": "./types/ConsoleUserMenu.d.ts",
+      "import": "./components/ConsoleUserMenu.vue"
+    },
+    "./components/LicenseDetailContent": {
+      "types": "./types/LicenseDetailContent.d.ts",
+      "import": "./components/LicenseDetailContent.vue"
+    },
+    "./components/ConsoleBreadcrumbs": {
+      "types": "./types/ConsoleBreadcrumbs.d.ts",
+      "import": "./components/ConsoleBreadcrumbs.vue"
+    },
+    "./components/ConsoleTopbar": {
+      "types": "./types/ConsoleTopbar.d.ts",
+      "import": "./components/ConsoleTopbar.vue"
+    },
+    "./components/ConsolePageTabs": {
+      "types": "./types/ConsolePageTabs.d.ts",
+      "import": "./components/ConsolePageTabs.vue"
+    },
+    "./components/ConsoleProfileLayout": {
+      "types": "./types/ConsoleProfileLayout.d.ts",
+      "import": "./components/ConsoleProfileLayout.vue"
+    },
+    "./components/ConsoleTrendChart": {
+      "types": "./types/ConsoleTrendChart.d.ts",
+      "import": "./components/ConsoleTrendChart.vue"
+    },
+    "./components/ConsoleAuthorizationState": {
+      "types": "./types/ConsoleAuthorizationState.d.ts",
+      "import": "./components/ConsoleAuthorizationState.vue"
+    }
+  },
+  "peerDependencies": {
+    "@nuxt/ui": "4.10.0",
+    "nuxt": "4.5.2",
+    "vue": ">=3.5.40 <3.6"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
+  },
+  "description": "Shared Nuxt UI console components and styles for QiSvc applications.",
+  "scripts": {
+    "test": "node --test tests/components.test.mjs"
+  },
+  "devDependencies": {
+    "@vue/compiler-sfc": "3.5.42",
+    "typescript": "5.9.3",
+    "vue": "3.5.42"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OrangeZh1/qisvc-console-ui.git"
+  },
+  "dependencies": {
+    "echarts": "6.1.0"
+  }
+}

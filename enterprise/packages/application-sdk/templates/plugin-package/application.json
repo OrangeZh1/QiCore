@@ -1,0 +1,11 @@
+{
+  "format": "qicore-plugin-v1",
+  "key": "example-plugin",
+  "packageKey": "plugin_example",
+  "version": "1.0.0",
+  "name": "示例扩展",
+  "applicationKey": "*",
+  "namespace": "examplePlugin",
+  "pendingTasks": [],
+  "routes": {"admin": [{"path":"status","method":"GET","permission":"status.read"}], "consumer": []}
+}

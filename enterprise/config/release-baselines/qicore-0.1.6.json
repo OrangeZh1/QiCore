@@ -1,0 +1,86 @@
+{
+  "format": "qicore-update-baseline-v1",
+  "packageKey": "frm_cdm43f43e7yhk5jd",
+  "version": "0.1.6",
+  "releaseManifestSha256": "46966bff2d4079389b7df79f374a746340dd4b604cbd287cd58d9bd265e5ad5f",
+  "source": "正式已发布且官方站已安装的0.1.6更新ZIP；2026-11-01重新核对实际ZIP摘要、9项Prisma文件及累计005/006/007原生迁移。",
+  "baselineSourceRef": "7bb193bfc2a2d8e2786d01b049de4646f1e064b9",
+  "publishedRuntimeSourceRef": "7bb193bfc2a2d8e2786d01b049de4646f1e064b9",
+  "baselineBuildNote": "固定源码用于隔离重建；Prisma完整清单和累计迁移与正式ZIP逐项核对，不将重建ZIP声称为与正式包字节相同。",
+  "prismaFiles": [
+    {
+      "path": "apps/api/prisma/migrations/001_framework_initial/migration.sql",
+      "sha256": "741964448b4b40b492ff0e7a00b7fa57fb35011cdb485fbe63483d00bdbbcb03",
+      "size": 44513
+    },
+    {
+      "path": "apps/api/prisma/migrations/002_mini_ad_settings/migration.sql",
+      "sha256": "0530aec47a6a4ed179485e780b6f68960b2747013c806b6282f68300fd9a5a19",
+      "size": 366
+    },
+    {
+      "path": "apps/api/prisma/migrations/003_storage_ownership/migration.sql",
+      "sha256": "dda11036a668476a4125f13f8b1137b88d88d62436f1d826a4712695f5079086",
+      "size": 344
+    },
+    {
+      "path": "apps/api/prisma/migrations/004_tenant_application_selection/migration.sql",
+      "sha256": "81151ef2c981f9379ed8d77837b5676c090a66325ec8bdbe202d120bf4358b7c",
+      "size": 559
+    },
+    {
+      "path": "apps/api/prisma/migrations/005_site_storage/migration.sql",
+      "sha256": "e05cd0971ad4369d0d2cc52a7759e7fa5c06479ee21e2e9438f46892538b8a8f",
+      "size": 394
+    },
+    {
+      "path": "apps/api/prisma/migrations/006_stored_images/migration.sql",
+      "sha256": "998bbaa2b98fb306b42aa513544bba2cb966374d52883caed9165786e6583fb3",
+      "size": 232
+    },
+    {
+      "path": "apps/api/prisma/migrations/007_query_indexes/migration.sql",
+      "sha256": "068a58a13415961cece027e2fb8058979e9f56e79e1c0c348dd025dd5e5f38b4",
+      "size": 1133
+    },
+    {
+      "path": "apps/api/prisma/migrations/migration_lock.toml",
+      "sha256": "00969ee045a3c3f087a3460235a1a744c1e35bde4441e0c55e163225eb077608",
+      "size": 19
+    },
+    {
+      "path": "apps/api/prisma/schema.prisma",
+      "sha256": "02fdd2b7213129dc949d20daccab39db6a9e1f9fc79a48280cecfd75c869d826",
+      "size": 32096
+    }
+  ],
+  "migrations": [
+    {
+      "id": "20261026000005_site_storage",
+      "kind": "database",
+      "order": 0,
+      "path": "migrations/20261026000005_site_storage.sql",
+      "reversible": true,
+      "sha256": "e05cd0971ad4369d0d2cc52a7759e7fa5c06479ee21e2e9438f46892538b8a8f",
+      "transactional": false
+    },
+    {
+      "id": "20261026000006_stored_images",
+      "kind": "database",
+      "order": 1,
+      "path": "migrations/20261026000006_stored_images.sql",
+      "reversible": true,
+      "sha256": "998bbaa2b98fb306b42aa513544bba2cb966374d52883caed9165786e6583fb3",
+      "transactional": false
+    },
+    {
+      "id": "20261028000007_query_indexes",
+      "kind": "database",
+      "order": 2,
+      "path": "migrations/20261028000007_query_indexes.sql",
+      "reversible": true,
+      "sha256": "068a58a13415961cece027e2fb8058979e9f56e79e1c0c348dd025dd5e5f38b4",
+      "transactional": false
+    }
+  ]
+}

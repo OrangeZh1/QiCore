@@ -1,0 +1,16 @@
+node_modules/
+.env
+.env.*
+!.env.example
+.local/
+.runtime/
+dist/
+.nuxt/
+.output/
+coverage/
+*.log
+artifacts/
+
+# Ephemeral CI compatibility materials; never part of the business source history.
+/.qa/photo-compatibility-inputs/
+/.qa/delivery-inputs/

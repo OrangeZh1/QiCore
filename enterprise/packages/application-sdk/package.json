@@ -1,0 +1,38 @@
+{
+  "name": "@qicore/application-sdk",
+  "version": "0.2.2",
+  "private": true,
+  "type": "module",
+  "files": [
+    "dist",
+    "development.mjs"
+  ],
+  "bin": {
+    "qicore": "./development.mjs"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    "./contracts": "./dist/contracts.mjs",
+    "./server": {
+      "types": "./dist/server.d.mts",
+      "default": "./dist/server.mjs"
+    },
+    "./development": "./development.mjs",
+    "./install": "./dist/install.mjs",
+    "./package-tools": "./dist/package-tools.mjs",
+    "./browser/decoration-types": "./dist/browser/decoration-types.ts",
+    "./browser/*.mjs": {
+      "types": "./dist/browser/core/*.d.mts",
+      "default": "./dist/browser/*.mjs"
+    },
+    "./browser/*": "./dist/browser/*",
+    "./console": "./dist/console/nuxt.config.ts",
+    "./console/*": "./dist/console/*",
+    "./client/*": "./dist/client/*",
+    "./templates/*": "./dist/templates/*"
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "node build.mjs --incremental && node --test test/*.test.mjs"
+  }
+}

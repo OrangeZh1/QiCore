@@ -1,0 +1,42 @@
+{
+  "format": "qicore-update-baseline-v1",
+  "packageKey": "frm_cdm43f43e7yhk5jd",
+  "version": "0.1.2",
+  "releaseManifestSha256": "b510b1dfa67195cd991d7676823f95610a02aab07e560aa8699988346539d981",
+  "source": "已发布 0.1.2 正式更新包，按发行记录核对清单摘要",
+  "baselineSourceRef": "d981ce62eecf14d732bbe45e268ead1bd078ed64",
+  "publishedRuntimeSourceRef": "d981ce62eecf14d732bbe45e268ead1bd078ed64",
+  "baselineBuildNote": "固定源码仅用于隔离重建；迁移与正式 Prisma 文件清单逐项核对。",
+  "prismaFiles": [
+    {
+      "path": "apps/api/prisma/migrations/001_framework_initial/migration.sql",
+      "sha256": "741964448b4b40b492ff0e7a00b7fa57fb35011cdb485fbe63483d00bdbbcb03",
+      "size": 44513
+    },
+    {
+      "path": "apps/api/prisma/migrations/002_mini_ad_settings/migration.sql",
+      "sha256": "0530aec47a6a4ed179485e780b6f68960b2747013c806b6282f68300fd9a5a19",
+      "size": 366
+    },
+    {
+      "path": "apps/api/prisma/migrations/003_storage_ownership/migration.sql",
+      "sha256": "dda11036a668476a4125f13f8b1137b88d88d62436f1d826a4712695f5079086",
+      "size": 344
+    },
+    {
+      "path": "apps/api/prisma/migrations/004_tenant_application_selection/migration.sql",
+      "sha256": "81151ef2c981f9379ed8d77837b5676c090a66325ec8bdbe202d120bf4358b7c",
+      "size": 559
+    },
+    {
+      "path": "apps/api/prisma/migrations/migration_lock.toml",
+      "sha256": "00969ee045a3c3f087a3460235a1a744c1e35bde4441e0c55e163225eb077608",
+      "size": 19
+    },
+    {
+      "path": "apps/api/prisma/schema.prisma",
+      "sha256": "a0b9b0188645ab6895fc88908c577f0f24f6b7ded9d89882e4480a0846538a9e",
+      "size": 31092
+    }
+  ]
+}

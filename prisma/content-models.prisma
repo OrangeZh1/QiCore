@@ -1,0 +1,76 @@
+model CoreHelpCategory {
+  scope String @db.VarChar(100)
+  id String @db.Char(36)
+  name String @db.VarChar(80)
+  sort Int @default(0)
+  enabled Boolean @default(true)
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.DateTime(3)
+  updatedAt DateTime @updatedAt @db.DateTime(3)
+  deletedAt DateTime? @db.DateTime(3)
+  articles CoreHelpArticle[]
+  @@id([scope, id])
+  @@index([scope, deletedAt, enabled, sort], map: "qc_help_categories_listing")
+  @@map("qc_help_categories")
+}
+
+model CoreHelpArticle {
+  scope String @db.VarChar(100)
+  id String @db.Char(36)
+  categoryId String @db.Char(36)
+  category CoreHelpCategory @relation(fields:[scope, categoryId], references:[scope, id], onDelete:Restrict)
+  title String @db.VarChar(120)
+  content String @db.MediumText
+  searchText String @db.MediumText
+  sort Int @default(0)
+  enabled Boolean @default(true)
+  version Int @default(1)
+  createdAt DateTime @default(now()) @db.DateTime(3)
+  updatedAt DateTime @updatedAt @db.DateTime(3)
+  deletedAt DateTime? @db.DateTime(3)
+  @@id([scope, id])
+  images CoreHelpImage[]
+  @@index([scope, categoryId, deletedAt, enabled, sort], map: "qc_help_articles_listing")
+  @@map("qc_help_articles")
+}
+
+model CorePolicyRevision {
+  scope String @db.VarChar(100)
+  kind String @db.VarChar(16)
+  version Int
+  title String @db.VarChar(80)
+  content String @db.MediumText
+  publishedAt DateTime @default(now()) @db.DateTime(3)
+  images CorePolicyImage[]
+  @@id([scope, kind, version])
+  @@map("qc_policy_revisions")
+}
+
+model CoreContactSettings {
+  scope String @id @db.VarChar(100)
+  config Json
+  version Int @default(1)
+  @@map("qc_contact_settings")
+}
+
+
+model CoreHelpImage {
+  scope String @db.VarChar(100)
+  articleId String @db.Char(36)
+  materialId String @db.Char(36)
+  article CoreHelpArticle @relation(fields:[scope, articleId], references:[scope, id], onDelete:Cascade)
+  @@id([scope, articleId, materialId])
+  @@index([materialId], map: "qc_help_images_lookup")
+  @@map("qc_help_images")
+}
+
+model CorePolicyImage {
+  scope String @db.VarChar(100)
+  kind String @db.VarChar(16)
+  version Int
+  materialId String @db.Char(36)
+  revision CorePolicyRevision @relation(fields:[scope, kind, version], references:[scope, kind, version], onDelete:Cascade)
+  @@id([scope, kind, version, materialId])
+  @@index([materialId], map: "qc_policy_images_lookup")
+  @@map("qc_policy_images")
+}

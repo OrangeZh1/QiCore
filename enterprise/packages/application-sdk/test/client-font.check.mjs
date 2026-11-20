@@ -1,0 +1,33 @@
+import assert from 'node:assert/strict';
+import {readFile,mkdir,writeFile} from 'node:fs/promises';
+import {join} from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {createRequire} from 'node:module';
+import {transform} from 'esbuild';
+import * as options from '../../../apps/api/src/core/decoration-options.mjs';
+import * as components from '../../../apps/api/src/core/decoration-components.mjs';
+import * as contracts from '../../../apps/api/src/core/decoration-contract.mjs';
+import * as framework from '../../../apps/api/src/core/decoration-framework.mjs';
+const root=fileURLToPath(new URL('../../../',import.meta.url)),require=createRequire(join(root,'apps/admin/package.json')),vue=require('vue'),compiler=require('vue/compiler-sfc'),{renderToString}=require('vue/server-renderer'),{chromium}=createRequire(join(root,'package.json'))('playwright');
+const evidence=process.argv[2];assert.ok(evidence,'Provide a task evidence directory');await mkdir(evidence,{recursive:true});
+const file=await readFile(new URL('../client/components/DecorationLinkItems.vue',import.meta.url),'utf8'),{descriptor}=compiler.parse(file),id='data-v-font-check';
+const script=compiler.compileScript(descriptor,{id,inlineTemplate:true,templateOptions:{compilerOptions:{isCustomElement:tag=>['view','text','image','scroll-view'].includes(tag)}}});
+const {code}=await transform(script.content,{loader:'ts',format:'cjs'}),module={exports:{}};
+const action=vue.defineComponent({props:['rootClass','rootStyle'],render(){return vue.h('view',{class:this.rootClass,style:this.rootStyle},this.$slots.default?.())}});
+const imports={'./DecorationAction.vue':{__esModule:true,default:action},'@qicore/application-sdk/browser/decoration-framework.mjs':framework,'@qicore/application-sdk/browser/decoration-components.mjs':components,'@qicore/application-sdk/browser/decoration-contract.mjs':contracts,'@qicore/application-sdk/browser/decoration-options.mjs':options};
+new Function('require','module','exports',code)(name=>name==='vue'?vue:imports[name],module,module.exports);module.exports.default.__scopeId=id;
+const block=contracts.decorationBlock('links','font-fixture');block.items=[{id:'records',label:'制作记录',target:'records',icon:'image'},{id:'help',label:'帮助中心',target:'help',icon:'circle-help'}];block.appearance.layout='list';block.appearance.columns=1;
+const custom={...block,options:{...block.options,labelSize:19,labelWeight:'bold'}};
+const app=vue.createSSRApp({render:()=>vue.h('main',{},[vue.h('section',{id:'defaults'},[vue.h(module.exports.default,{block,items:block.items,images:{}})]),vue.h('section',{id:'configured'},[vue.h(module.exports.default,{block:custom,items:custom.items,images:{}})])])});
+app.component('scroll-view',{render(){return vue.h('scroll-view',{},this.$slots.default?.())}});
+const html=await renderToString(app);
+const css=compiler.compileStyle({id,source:descriptor.styles.map(style=>style.content).join('\n'),scoped:true}).code;
+const rpx=value=>value.replace(/(-?\d+(?:\.\d+)?)rpx/g,(_,value)=>Number(value)/2+'px');
+const browser=await chromium.launch({headless:true,channel:process.platform==='win32'?'msedge':undefined});
+try{
+ const page=await browser.newPage({viewport:{width:450,height:540}});await page.setContent('<style>body{font-family:serif;background:#f3f9ff;margin:24px}view,scroll-view{display:block}section{background:white;border-radius:16px;margin-bottom:24px;padding:8px}image{display:none!important}'+rpx(css)+'</style>'+rpx(html));
+ const styles=await page.locator('.nav-label').evaluateAll(nodes=>nodes.map(node=>({text:node.textContent,font:getComputedStyle(node).fontFamily,size:getComputedStyle(node).fontSize,weight:getComputedStyle(node).fontWeight})));
+ assert.equal(styles.length,4);for(const style of styles)assert.match(style.font,/Microsoft YaHei.*sans-serif/);
+ assert.equal(styles[0].font,styles[1].font);assert.equal(styles[0].size,'14px');assert.equal(styles[0].weight,'400');assert.equal(styles[2].size,'19px');assert.equal(styles[2].weight,'700');
+ await page.screenshot({path:join(evidence,'profile-link-fonts.png')});await writeFile(join(evidence,'result.json'),JSON.stringify({styles,isolatedParentFont:'serif',configuredLabelStylePreserved:true},null,2));console.log(JSON.stringify(styles));
+}finally{await browser.close()}

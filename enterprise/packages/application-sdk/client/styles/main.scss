@@ -1,0 +1,23 @@
+page{--client-font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;--client-page-background:#f3f9ff;--client-page-gutter:20rpx;--client-content-top:16px;--client-header-title-size:18px;--client-navigation-top:12px;font-family:var(--client-font-family,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif);background:var(--client-page-background, #f3f9ff);color:var(--client-text, #1e293b);font-size:28rpx} .page{padding:var(--client-content-top,16px) var(--client-page-gutter, 10px) 72rpx;padding-bottom:calc(72rpx + env(safe-area-inset-bottom))}.title{font-size:42rpx;font-weight:700;line-height:1.5}.subtitle,.muted{color:#6c7e96;line-height:1.65;font-size:25rpx}.card{background:#fff;border:1rpx solid #e6edf8;border-radius:24rpx;padding:30rpx;margin:24rpx 0;box-shadow:0 6rpx 24rpx rgba(36,70,130,.035)}.section{font-size:31rpx;font-weight:650;margin-bottom:20rpx}.row{display:flex;align-items:center;gap:18rpx}.between{justify-content:space-between}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16rpx}.choice{border:2rpx solid #e0e7f3;border-radius:16rpx;padding:24rpx 12rpx;text-align:center;background:#fff}.selected{border-color:var(--client-primary, #2563eb);background:#edf4ff;color:var(--client-primary, #2563eb)}button{font-size:28rpx;border-radius:16rpx;background:#edf3ff;color:var(--client-primary, #2563eb);margin:16rpx 0;line-height:2.8}button:after{border:0}button.primary{background:var(--client-primary, #2563eb);color:white}button[disabled]{opacity:.5}.notice{padding:20rpx 24rpx;border-radius:16rpx;background:#edf3ff;color:#526d97;line-height:1.65;font-size:24rpx;margin-bottom:22rpx}.error{background:#fff0ef;color:#b84039;padding:22rpx;border-radius:16rpx;margin:20rpx 0;line-height:1.6}.tag{background:#edf4ff;border-radius:8rpx;padding:5rpx 12rpx;font-size:22rpx;color:var(--client-primary, #2563eb)}.label{display:block;color:#465d7d;margin:20rpx 0 12rpx}input{border:1rpx solid #dce5f3;border-radius:12rpx;padding:20rpx;height:48rpx;background:#fff}.preview{width:210rpx;height:294rpx;display:block;margin:20rpx auto;border-radius:12rpx;background:#edf3fb;box-shadow:0 8rpx 30rpx rgba(33,57,95,.08)}.actions{margin-top:30rpx}.link{color:var(--client-primary, #2563eb);font-size:26rpx;padding:12rpx 0}.empty{text-align:center;padding:80rpx 24rpx;color:#6c7e96}.badge{color:#ca762d;font-size:23rpx}.rule{line-height:1.7;font-size:25rpx;color:#6b7d95}
+
+/* #ifdef H5 */
+/* Keep the real mobile client at phone width on desktop, with its navigation at the viewport bottom. */
+/* uni-app converts rpx to rem using a 750-unit canvas. Match the constrained client width. */
+html{--client-page-background:#f3f9ff;--client-page-gutter:20rpx;--client-content-top:16px;--client-header-title-size:18px;--client-navigation-top:12px;font-size:calc(min(100vw, 480px) / 750 * 32)!important}
+body{font-family:var(--client-font-family,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif);background:#edf2f8}uni-page-head .uni-page-head,.diy-navigation{max-width:480px;margin-inline:auto}uni-page-wrapper{max-width:480px;margin-inline:auto;min-height:calc(100dvh - var(--window-top,0px));background:var(--client-page-background, #f3f9ff)}uni-page-body{min-height:calc(100dvh - var(--window-top,0px))}
+/* #endif */
+
+/* Hide tracks without disabling touch, wheel, or keyboard scrolling. */
+::-webkit-scrollbar{display:none!important;width:0!important;height:0!important;background:transparent}
+/* #ifdef H5 */
+*{scrollbar-width:none}
+/* #endif */
+
+/* #ifdef H5 */
+uni-page-head .uni-page-head{background:var(--client-page-background, #f3f9ff)!important;color:var(--client-text,#1e293b)!important;box-shadow:none!important;border-bottom:0!important}
+uni-page-head .uni-page-head-hd,uni-page-head .uni-page-head-ft{color:inherit!important}
+/* #endif */
+
+/* #ifdef MP-WEIXIN */
+.client-page-scroll{display:block;height:100vh;box-sizing:border-box}
+/* #endif */
