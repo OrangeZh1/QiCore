@@ -140,6 +140,7 @@ export async function verifyConsole(page, origin, adminLogin) {
   }
 
   assert.equal(await nav.getByRole('link', {name:'框架与应用',exact:true}).count(), 0)
+  await follow('工作台')
   await page.getByRole('main').getByRole('link', { name: '问候示例', exact: true }).waitFor()
   const memberLogin = 'web-reader-' + randomBytes(3).toString('hex')
   const password = randomBytes(20).toString('hex')
