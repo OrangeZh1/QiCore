@@ -16,6 +16,18 @@ async function heldRequest(page, path, method, trigger, check, responseOverride)
     const [request] = await Promise.all([page.waitForRequest(matches), trigger()])
     await check(request)
     return request
+  } catch (error) {
+    // Report labels and constraint failures only. Field values can include passwords.
+    const state = await page.locator('[role="dialog"] form').evaluateAll(forms => forms.map(form => ({
+      id: form.id,
+      invalid: [...form.elements].filter(el => el.validity && !el.validity.valid)
+        .map(el => ({ label: el.getAttribute('aria-label') || el.name, reason: el.validationMessage })),
+      submit: [...document.querySelectorAll('button[type="submit"]')].filter(el => el.form === form)
+        .map(el => ({ label: el.textContent.trim(), disabled: el.disabled })),
+      alerts: [...form.querySelectorAll('[role="alert"]')].map(el => el.textContent.trim()),
+    })))
+    console.error('Browser action failed', method, path, JSON.stringify(state))
+    throw error
   } finally {
     gate.resolve()
     await page.unroute(isEndpoint, handler)
