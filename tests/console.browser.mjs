@@ -187,7 +187,7 @@ export async function verifyConsole(page, origin, adminLogin) {
   await editor.getByLabel('登录账号', { exact: true }).fill(memberLogin)
   await editor.getByLabel('名称', { exact: true }).fill('浏览器新增成员')
   await editor.getByLabel('手机号', { exact: true }).fill('13800000001')
-  await editor.getByRole('combobox', { name: '所属角色' }).click()
+  await editor.getByLabel('所属角色', { exact: true }).click()
   await page.getByRole('option', { name: roleTitle, exact: true }).click()
   await editor.getByLabel('密码', { exact: true }).fill(password)
   await editor.getByLabel('确认密码', { exact: true }).fill(password)
