@@ -15,6 +15,7 @@ async function heldRequest(page, path, method, trigger, check, responseOverride)
   try {
     const [request] = await Promise.all([page.waitForRequest(matches), trigger()])
     await check(request)
+    return request
   } finally {
     gate.resolve()
     await page.unroute(isEndpoint, handler)
@@ -151,14 +152,15 @@ export async function verifyConsole(page, origin, adminLogin) {
   await roleEditor.getByLabel('角色名称').fill(roleTitle)
   await roleEditor.getByRole('checkbox', { name: '查看管理员', exact: true }).click()
   const saveRole = roleEditor.getByRole('button', { name: '创建角色' })
-  const createdResponse = page.waitForResponse(res => new URL(res.url()).pathname === '/api/admin/roles' && res.request().method() === 'POST')
-  await heldRequest(page, '/api/admin/roles', 'POST', () => saveRole.click(), async request => {
+  // Modal dialogs hide the underlying controls from the accessibility tree. Only inspect their state.
+  const behindDrawer = name => page.getByRole('button', { name, exact: true, includeHidden: true })
+  const createdRequest = await heldRequest(page, '/api/admin/roles', 'POST', () => saveRole.click(), async request => {
     assert.equal(request.postDataJSON().id, undefined, '由服务端分配角色标识')
     assert.equal(await saveRole.getAttribute('aria-busy'), 'true')
     assert.equal(await page.locator('button[aria-busy="true"]').count(), 1)
-    assert.ok(await button('刷新当前页面').isEnabled())
+    assert.ok(await behindDrawer('刷新当前页面').isEnabled())
   })
-  const created = await createdResponse
+  const created = await createdRequest.response()
   assert.ok(created.ok(), '创建目录只读角色')
   const assignedRoleId = (await created.json()).id
   assert.ok(typeof assignedRoleId === 'string' && assignedRoleId.length > 0)
@@ -193,8 +195,8 @@ export async function verifyConsole(page, origin, adminLogin) {
   await heldRequest(page, '/api/admin/administrators', 'POST', () => createAccount.click(), async req => {
     assert.equal(req.postDataJSON().roleId, assignedRoleId)
     assert.equal(await createAccount.getAttribute('aria-busy'), 'true')
-    assert.equal(await button('查询').getAttribute('aria-busy'), 'false')
-    assert.equal(await button('重置').getAttribute('aria-busy'), 'false')
+    assert.equal(await behindDrawer('查询').getAttribute('aria-busy'), 'false')
+    assert.equal(await behindDrawer('重置').getAttribute('aria-busy'), 'false')
   })
   const memberRow = page.getByRole('row').filter({ hasText: memberLogin })
   await memberRow.getByText(roleTitle, { exact: true }).waitFor()
@@ -219,8 +221,8 @@ export async function verifyConsole(page, origin, adminLogin) {
   await heldRequest(page, '/api/me', 'PATCH', () => saveOwn.click(), async req => {
     assert.deepEqual(req.postDataJSON(), { displayName: '本人行改名' })
     assert.equal(await saveOwn.getAttribute('aria-busy'), 'true')
-    assert.equal(await button('查询').getAttribute('aria-busy'), 'false')
-    assert.ok(await button('刷新当前页面').isEnabled())
+    assert.equal(await behindDrawer('查询').getAttribute('aria-busy'), 'false')
+    assert.ok(await behindDrawer('刷新当前页面').isEnabled())
   })
   await ownRow.getByText('本人行改名', { exact: true }).waitFor()
   await page.getByRole('button', { name: '本人行改名用户菜单' }).waitFor()
