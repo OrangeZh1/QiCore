@@ -1,6 +1,6 @@
-# QiCore 单开版源码基线
+# QiCore 源码与来源
 
-本目录从 QiCore-SaaS 提交 `38af676e2b2a4c1f86d4c5ccf713c70a1a81d020` 导入，作为单开版的适配起点。API、后台、客户端、应用 SDK、共享 UI、测试与构建脚本保留上游目录结构。源码开发的运行要求和工作区参数见[上游开发说明](https://github.com/OrangeZh1/Qicore-Saas/blob/38af676e2b2a4c1f86d4c5ccf713c70a1a81d020/docs/development-workspace.md)。
+本目录从 QiCore-SaaS 提交 `38af676e2b2a4c1f86d4c5ccf713c70a1a81d020` 导入，作为 QiCore 工作区的初始源码。API、后台、客户端、应用 SDK、共享 UI、测试与构建脚本保留上游目录结构。源码开发的运行要求和工作区参数见[上游开发说明](https://github.com/OrangeZh1/Qicore-Saas/blob/38af676e2b2a4c1f86d4c5ccf713c70a1a81d020/docs/development-workspace.md)。
 
 ## 来源与校验
 

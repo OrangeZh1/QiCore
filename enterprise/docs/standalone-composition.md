@@ -1,4 +1,4 @@
-# 单开产品的应用与插件
+# QiCore 应用与插件
 
 纯框架可独立运行。每个商业产品包含一个主应用，可同时携带多个插件。主应用使用 `qicore-application-v1`、`app_…`，插件使用 `qicore-plugin-v1`、`plugin_…` 或 `plg_…`。插件声明自己的 key、namespace、版本、权限、路由和 applicationKey。指定主应用时须与本包主应用 key 相同，通用插件沿用上游的 `*` 归属和权限检查。已保留的历史组件身份继续参与冲突检查。
 
@@ -10,7 +10,7 @@
 
 制作方先在受控构建目录生成可启动的 Linux x64 Node 24 完整产品。根目录包含 `product.json`（version、frameworkVersion）、`server/start.mjs` 和实际运行依赖。每个预构建主应用或插件位于 `components/<packageKey>/`，目录含 application.json、entry.mjs 和描述中声明的前端资源。主应用版本与产品版本一致，插件保留各自版本。
 
-编译单开版 API 后执行以下命令，生成仅写一次的 `standalone-components.json`。
+编译 QiCore API 后执行以下命令，生成仅写一次的 `standalone-components.json`。
 
 ```sh
 node scripts/prepare-standalone-composition.mjs /path/to/payload /path/to/product-public.json
@@ -28,13 +28,13 @@ node scripts/prepare-standalone-composition.mjs /path/to/payload /path/to/produc
 | `QICORE_STANDALONE_BUNDLE_ROOT` | 当前准备启动的真实版本目录 |
 | `QICORE_STANDALONE_RELEASE_FILE` | 独立更新助手已核验并持久化的该版本完整发行元数据，含受信的 STANDALONE 初装或在线更新签名 |
 
-API 启动会复核产品身份、发行签名、发布版本、整个目录的文件清单、每个组件的摘要和插件归属，再加载代码。每个插件的权限检查和授权状态独立生效。Nuxt 的受管启动命令在生产进程中通过 `node --import /path/to/scripts/standalone-web-preload.mjs …` 装配相同的已验证目录，使页面资源和服务端从同一产品版本加载。该预加载器仅供 Nuxt 渲染进程使用。Nuxt 将验证后的目录绑定到自己的 Node 进程；仅提供原 SaaS 的 QICORE_COMPONENTS 环境变量时，商业渲染器会拒绝加载。纯框架使用单开版源码的独立安装流程，商业整包走该产品专用的安装与恢复助手。
+API 启动会复核产品身份、发行签名、发布版本、整个目录的文件清单、每个组件的摘要和插件归属，再加载代码。每个插件的权限检查和授权状态独立生效。Nuxt 的受管启动命令在生产进程中通过 `node --import /path/to/scripts/standalone-web-preload.mjs …` 装配相同的已验证目录，使页面资源和服务端从同一产品版本加载。该预加载器仅供 Nuxt 渲染进程使用。Nuxt 将验证后的目录绑定到自己的 Node 进程；仅提供原 SaaS 的 QICORE_COMPONENTS 环境变量时，商业渲染器会拒绝加载。纯框架使用 QiCore 源码的独立安装流程，商业整包走该产品专用的安装与恢复助手。
 
 ## 整包更新
 
 `QICORE_STANDALONE_UPDATER_SOCKET` 指向该产品的受限本机更新助手。助手负责文件锁、在线下载权益、签名清单、版本切换、健康回执和失败恢复。后台使用助手的 `GET /status`、`POST /check` 和 `POST /apply` 契约；发起实际更新前，助手返回的 current.slot 须等于当前签名 release 的 `版本号-清单SHA256`，框架版本亦须匹配。视图中只提供整包更新。产品身份来自部署方固定的公开配置。
 
-旧单开 SDK 声明采用 Express register 回调，旧 Prisma 账号表和网页接口与单开版 SDK 的 application.json、createApplication 和后台会话契约不同。已经依赖旧 SDK 的应用需要完成入口、数据库和权限映射后才能进入单开产品整包。维护既有安装时使用该产品原有的稳定助手、收据和保留策略。
+旧单开 SDK 声明采用 Express register 回调，旧 Prisma 账号表和网页接口与 QiCore SDK 的 application.json、createApplication 和后台会话契约不同。已经依赖旧 SDK 的应用需要完成入口、数据库和权限映射后才能进入单开产品整包。维护既有安装时使用该产品原有的稳定助手、收据和保留策略。
 
 ## 隔离验收
 
